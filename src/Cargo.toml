@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "chunk_server",
+    "catalogue_master",
+]
