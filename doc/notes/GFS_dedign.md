@@ -20,6 +20,7 @@
 
 ## chunkserver
 1. 小文件存储方式
+- 小文件存储在一个 chunk 中, master 记录下 `chunk-id`和偏移
 
 2. 小文件查找方式
 
@@ -29,4 +30,8 @@
 
 
 ## 目录master
+### 需要记录的数据内容
+1. 命名空间+文件名 和 `chunk-id` 的关系
+- 因为要存储小文件, 所以一个 `chunk-id` 中会存在多个偏移, 用于表示不同的 小文件
+2. `chunk-id`和所有 chunkserver 副本的关系
 
