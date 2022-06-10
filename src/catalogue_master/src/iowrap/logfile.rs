@@ -3,11 +3,11 @@ use std::path::Path;
 
 use crate::{Error, Result};
 
-pub struct MemDisk {
+pub struct LogFile {
     file: File,
 }
 
-impl MemDisk {
+impl LogFile {
     fn load(&mut self) {}
 
     pub fn open(path: impl AsRef<Path>) -> Result<Self> {
