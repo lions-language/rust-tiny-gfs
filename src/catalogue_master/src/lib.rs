@@ -1,3 +1,4 @@
+mod chunk;
 mod error;
 mod idgenerator;
 mod iowrap;
