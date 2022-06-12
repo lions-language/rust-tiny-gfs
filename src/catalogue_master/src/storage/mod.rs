@@ -1,12 +1,7 @@
 mod mem_disk;
 
-pub struct NSNode {
-    name: String,
-}
+use crate::*;
 
-pub struct Data {
-    namespace: Vec<NSNode>,
-    name: String,
+pub trait Storage {
+    fn find(path: &Path) -> Result<File>;
 }
-
-pub trait Storage {}
