@@ -1,9 +1,8 @@
 mod chunk;
 mod error;
-mod idgenerator;
 mod iowrap;
 mod serdeser;
-mod storage;
+mod service;
 
 pub(crate) use error::{Error, Result};
 
@@ -16,10 +15,10 @@ pub struct Path {
     name: String,
 }
 
-struct ChunkServerId(String);
+struct ChunkServer(String);
 
 struct Chunk {
-    chunk_server_id: ChunkServerId,
+    chunk_server: ChunkServer,
 }
 
 struct ChunkId(String);
@@ -30,11 +29,10 @@ impl From<String> for ChunkId {
     }
 }
 
-struct Offset(i64);
-
 struct FileObject {
     chunk_id: ChunkId,
-    offset: Offset,
+    pos: usize,
+    length: usize,
 }
 
 pub struct File {
