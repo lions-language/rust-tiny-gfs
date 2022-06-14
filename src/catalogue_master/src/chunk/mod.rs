@@ -1,9 +1,13 @@
 mod storage;
 
-pub struct ChunkMgr {}
+use storage::{Storage, StorageMode};
 
-impl ChunkMgr {
-    pub fn new() -> Self {
+pub struct ChunkService {
+    storage: Box<dyn Storage>,
+}
+
+impl ChunkService {
+    pub fn new(mode: StorageMode) -> Self {
         Self {}
     }
 }
