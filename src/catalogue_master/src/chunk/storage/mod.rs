@@ -1,8 +1,21 @@
 mod memory;
 
 use crate::{Chunk, ChunkId, Result};
+use memory::Memory;
 
-pub enum StorageMode {}
+pub enum StorageMode {
+    Memory,
+}
+
+pub struct StorageFactory {}
+
+impl StorageFactory {
+    pub fn new_storage(mode: StorageMode) -> Result<Box<dyn Storage>> {
+        match mode {
+            StorageMode::Memory => Ok(Box::new(Memory::new())),
+        }
+    }
+}
 
 pub trait Storage {
     fn insert(&mut self, chunk_id: &ChunkId, chunk: Chunk) -> Result<()>;
