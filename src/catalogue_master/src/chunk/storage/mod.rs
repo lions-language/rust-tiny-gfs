@@ -10,14 +10,14 @@ pub enum StorageMode {
 pub struct StorageFactory {}
 
 impl StorageFactory {
-    pub fn new_storage(mode: StorageMode) -> Result<Box<dyn Storage>> {
+    pub(crate) fn new_storage(mode: StorageMode) -> Result<Box<dyn Storage>> {
         match mode {
             StorageMode::Memory => Ok(Box::new(Memory::new())),
         }
     }
 }
 
-pub trait Storage {
+pub(crate) trait Storage {
     fn insert(&mut self, chunk_id: &ChunkId, chunk: Chunk) -> Result<()>;
     fn find(&self, chunk_id: &ChunkId) -> Result<Chunk>;
 }

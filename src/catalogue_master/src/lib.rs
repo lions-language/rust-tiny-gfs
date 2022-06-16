@@ -15,13 +15,11 @@ pub struct Path {
     name: String,
 }
 
-struct ChunkServer(String);
-
-struct Chunk {
+pub(crate) struct Chunk {
     chunk_server: ChunkServer,
 }
 
-struct ChunkId(String);
+pub(crate) struct ChunkId(String);
 
 impl From<String> for ChunkId {
     fn from(v: String) -> Self {
@@ -38,3 +36,5 @@ struct FileObject {
 pub struct File {
     objects: Vec<FileObject>,
 }
+
+struct ChunkServer(String);
