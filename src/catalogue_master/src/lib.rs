@@ -4,6 +4,8 @@ mod iowrap;
 mod serdeser;
 mod service;
 
+pub use chunk::StorageMode as ChunkStorageMode;
+
 pub(crate) use error::{Error, Result};
 
 struct NSNode {

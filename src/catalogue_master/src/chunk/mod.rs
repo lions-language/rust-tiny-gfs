@@ -1,7 +1,9 @@
 mod storage;
 
+pub use storage::StorageMode;
+
 use crate::Result;
-use storage::{Storage, StorageFactory, StorageMode};
+use storage::{Storage, StorageFactory};
 
 pub struct ChunkService {
     storage: Box<dyn Storage>,

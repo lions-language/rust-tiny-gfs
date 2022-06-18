@@ -7,7 +7,7 @@ pub enum StorageMode {
     Memory,
 }
 
-pub struct StorageFactory {}
+pub(crate) struct StorageFactory {}
 
 impl StorageFactory {
     pub(crate) fn new_storage(mode: StorageMode) -> Result<Box<dyn Storage>> {
