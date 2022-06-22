@@ -11,7 +11,9 @@ pub struct ChunkHandler {
 
 impl ChunkHandler {
     pub fn start(&mut self) -> Result<()> {
-        unimplemented!();
+        use tokio::runtime::Runtime;
+        let rt = Runtime::new()?;
+        rt.block_on(async {})
     }
 
     fn handle_heartbeat(&mut self) -> Result<()> {
