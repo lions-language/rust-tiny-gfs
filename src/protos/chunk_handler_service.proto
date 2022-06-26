@@ -2,7 +2,13 @@ syntax = "proto3";
 
 package chunk_handler;
 
+message RegisterRequest {
+}
+
+message RegisterResponse {
+}
+
 service ChunkHandlerService {
-  // rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc register (RegisterRequest) returns (RegisterResponse) {}
 }
 

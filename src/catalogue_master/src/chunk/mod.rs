@@ -11,22 +11,20 @@ use tonic::{transport::Server, Request, Response, Status};
 //     tonic::include_proto!("/proto/chunk_handler_service");
 // }
 
-use crate::proto::chunk_handler_service_server::*;
+use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 #[derive(Default)]
 pub struct Service {}
 
 #[tonic::async_trait]
 impl ChunkHandlerService for Service {
-    async fn say_hello(
+    async fn register(
         &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
+        request: Request<RegisterRequest>,
+    ) -> std::result::Result<Response<RegisterResponse>, Status> {
         println!("Got a request from {:?}", request.remote_addr());
 
-        let reply = hello_world::HelloReply {
-            message: format!("Hello {}!", request.into_inner().name),
-        };
+        let reply = RegisterResponse {};
         Ok(Response::new(reply))
     }
 }
@@ -41,11 +39,11 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let greeter = MyGreeter::default();
+        let s = Service::default();
 
         rt.block_on(async {
             Server::builder()
-                .add_service(GreeterServer::new(greeter))
+                .add_service(ChunkHandlerServiceServer::new(s))
                 .serve(addr)
                 .await?;
         })
