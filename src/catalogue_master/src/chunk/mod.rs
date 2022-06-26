@@ -45,8 +45,11 @@ impl ChunkHandler {
             Server::builder()
                 .add_service(ChunkHandlerServiceServer::new(s))
                 .serve(addr)
-                .await?;
-        })
+                .await
+                .unwrap();
+        });
+
+        Ok(())
     }
 
     fn handle_heartbeat(&mut self) -> Result<()> {
