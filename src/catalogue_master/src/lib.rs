@@ -1,6 +1,7 @@
 mod chunk;
 mod error;
 mod iowrap;
+mod proto;
 mod serdeser;
 mod service;
 

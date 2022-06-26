@@ -7,9 +7,11 @@ use storage::{Storage, StorageFactory};
 
 use tonic::{transport::Server, Request, Response, Status};
 
-pub mod chunk_handler {
-    tonic::include_proto!("chunk_handler");
-}
+// pub mod chunk_handler {
+//     tonic::include_proto!("/proto/chunk_handler_service");
+// }
+
+use crate::proto::chunk_handler_service_server::*;
 
 #[derive(Default)]
 pub struct Service {}

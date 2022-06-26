@@ -6,10 +6,10 @@ fn main() -> Result<()> {
     let _ = std::fs::create_dir(out_dir);
 
     tonic_build::configure()
-        .build_server(false)
+        .build_server(true)
         .out_dir(out_dir)
         .type_attribute(".", "#[derive(serde::Serialize, serde::Deserialize)]")
-        .compile(&["chunk_handler_service.proto"], &["../../protos"])?;
+        .compile(&["chunk_handler_service.proto"], &["../protos"])?;
 
     Ok(())
 }
