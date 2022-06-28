@@ -14,10 +14,10 @@ use tonic::{transport::Server, Request, Response, Status};
 use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 #[derive(Default)]
-pub struct Service {}
+pub struct ChunkHandlerServiceImpl {}
 
 #[tonic::async_trait]
-impl ChunkHandlerService for Service {
+impl ChunkHandlerService for ChunkHandlerServiceImpl {
     async fn register(
         &self,
         request: Request<RegisterRequest>,
@@ -39,7 +39,7 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let s = Service::default();
+        let s = ChunkHandlerServiceImpl::default();
 
         rt.block_on(async {
             Server::builder()

@@ -8,7 +8,14 @@ message RegisterRequest {
 message RegisterResponse {
 }
 
+message HeartbeatRequest {
+}
+
+message HeartbeatResponse {
+}
+
 service ChunkHandlerService {
-  rpc register (RegisterRequest) returns (RegisterResponse) {}
+  rpc register(RegisterRequest) returns (RegisterResponse) {}
+  rpc heartbeat(stream HeartbeatRequest) returns (HeartbeatResponse) {}
 }
 

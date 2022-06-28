@@ -6,6 +6,14 @@ pub struct RegisterRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RegisterResponse {
 }
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct HeartbeatRequest {
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct HeartbeatResponse {
+}
 /// Generated client implementations.
 pub mod chunk_handler_service_client {
     #![allow(unused_variables, dead_code, missing_docs, clippy::let_unit_value)]
@@ -89,6 +97,27 @@ pub mod chunk_handler_service_client {
             );
             self.inner.unary(request.into_request(), path, codec).await
         }
+        pub async fn heartbeat(
+            &mut self,
+            request: impl tonic::IntoStreamingRequest<Message = super::HeartbeatRequest>,
+        ) -> Result<tonic::Response<super::HeartbeatResponse>, tonic::Status> {
+            self.inner
+                .ready()
+                .await
+                .map_err(|e| {
+                    tonic::Status::new(
+                        tonic::Code::Unknown,
+                        format!("Service was not ready: {}", e.into()),
+                    )
+                })?;
+            let codec = tonic::codec::ProstCodec::default();
+            let path = http::uri::PathAndQuery::from_static(
+                "/chunk_handler.ChunkHandlerService/heartbeat",
+            );
+            self.inner
+                .client_streaming(request.into_streaming_request(), path, codec)
+                .await
+        }
     }
 }
 /// Generated server implementations.
@@ -102,6 +131,10 @@ pub mod chunk_handler_service_server {
             &self,
             request: tonic::Request<super::RegisterRequest>,
         ) -> Result<tonic::Response<super::RegisterResponse>, tonic::Status>;
+        async fn heartbeat(
+            &self,
+            request: tonic::Request<tonic::Streaming<super::HeartbeatRequest>>,
+        ) -> Result<tonic::Response<super::HeartbeatResponse>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct ChunkHandlerServiceServer<T: ChunkHandlerService> {
@@ -184,6 +217,46 @@ pub mod chunk_handler_service_server {
                                 send_compression_encodings,
                             );
                         let res = grpc.unary(method, req).await;
+                        Ok(res)
+                    };
+                    Box::pin(fut)
+                }
+                "/chunk_handler.ChunkHandlerService/heartbeat" => {
+                    #[allow(non_camel_case_types)]
+                    struct heartbeatSvc<T: ChunkHandlerService>(pub Arc<T>);
+                    impl<
+                        T: ChunkHandlerService,
+                    > tonic::server::ClientStreamingService<super::HeartbeatRequest>
+                    for heartbeatSvc<T> {
+                        type Response = super::HeartbeatResponse;
+                        type Future = BoxFuture<
+                            tonic::Response<Self::Response>,
+                            tonic::Status,
+                        >;
+                        fn call(
+                            &mut self,
+                            request: tonic::Request<
+                                tonic::Streaming<super::HeartbeatRequest>,
+                            >,
+                        ) -> Self::Future {
+                            let inner = self.0.clone();
+                            let fut = async move { (*inner).heartbeat(request).await };
+                            Box::pin(fut)
+                        }
+                    }
+                    let accept_compression_encodings = self.accept_compression_encodings;
+                    let send_compression_encodings = self.send_compression_encodings;
+                    let inner = self.inner.clone();
+                    let fut = async move {
+                        let inner = inner.0;
+                        let method = heartbeatSvc(inner);
+                        let codec = tonic::codec::ProstCodec::default();
+                        let mut grpc = tonic::server::Grpc::new(codec)
+                            .apply_compression_config(
+                                accept_compression_encodings,
+                                send_compression_encodings,
+                            );
+                        let res = grpc.client_streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
