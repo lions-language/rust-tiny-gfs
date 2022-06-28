@@ -5,7 +5,7 @@ pub use storage::StorageMode;
 use crate::Result;
 use storage::{Storage, StorageFactory};
 
-use tonic::{transport::Server, Request, Response, Status};
+use tonic::{transport::Server, Request, Response, Status, Streaming};
 
 // pub mod chunk_handler {
 //     tonic::include_proto!("/proto/chunk_handler_service");
@@ -26,6 +26,43 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 
         let reply = RegisterResponse {};
         Ok(Response::new(reply))
+    }
+
+    async fn heartbeat(
+        &self,
+        request: Request<Streaming<HeartbeatRequest>>,
+    ) -> Result<Response<HeartbeatResponse>, Status> {
+        println!("EchoServer::server_streaming_echo");
+        println!("\tclient connected from: {:?}", req.remote_addr());
+
+        // creating infinite stream with requested message
+        let repeat = std::iter::repeat(EchoResponse {
+            message: req.into_inner().message,
+        });
+        let mut stream = Box::pin(tokio_stream::iter(repeat).throttle(Duration::from_millis(200)));
+
+        // spawn and channel are required if you want handle "disconnect" functionality
+        // the `out_stream` will not be polled after client disconnect
+        let (tx, rx) = mpsc::channel(128);
+        tokio::spawn(async move {
+            while let Some(item) = stream.next().await {
+                match tx.send(Result::<_, Status>::Ok(item)).await {
+                    Ok(_) => {
+                        // item (server response) was queued to be send to client
+                    }
+                    Err(_item) => {
+                        // output_stream was build from rx and both are dropped
+                        break;
+                    }
+                }
+            }
+            println!("\tclient disconnected");
+        });
+
+        let output_stream = ReceiverStream::new(rx);
+        Ok(Response::new(
+            Box::pin(output_stream) as Self::ServerStreamingEchoStream
+        ))
     }
 }
 
