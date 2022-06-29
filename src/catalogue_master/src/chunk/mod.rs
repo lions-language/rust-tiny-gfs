@@ -5,7 +5,11 @@ pub use storage::StorageMode;
 use crate::Result;
 use storage::{Storage, StorageFactory};
 
+use tokio::sync::mpsc;
+use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
+
+use std::{pin::Pin, time::Duration};
 
 // pub mod chunk_handler {
 //     tonic::include_proto!("/proto/chunk_handler_service");
@@ -32,11 +36,10 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         &self,
         request: Request<Streaming<HeartbeatRequest>>,
     ) -> Result<Response<HeartbeatResponse>, Status> {
-        println!("EchoServer::server_streaming_echo");
-        println!("\tclient connected from: {:?}", req.remote_addr());
+        println!("\tclient connected from: {:?}", request.remote_addr());
 
         // creating infinite stream with requested message
-        let repeat = std::iter::repeat(EchoResponse {
+        let repeat = std::iter::repeat(HeartbeatResponse {
             message: req.into_inner().message,
         });
         let mut stream = Box::pin(tokio_stream::iter(repeat).throttle(Duration::from_millis(200)));
