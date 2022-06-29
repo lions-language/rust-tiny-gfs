@@ -5,6 +5,7 @@ pub use storage::StorageMode;
 use crate::Result;
 use storage::{Storage, StorageFactory};
 
+use futures::Stream;
 use tokio::sync::mpsc;
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
@@ -16,6 +17,9 @@ use std::{pin::Pin, time::Duration};
 // }
 
 use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
+
+type HeartbeatResponseStream =
+    Pin<Box<dyn Stream<Item = Result<HeartbeatResponse, Status>> + Send>>;
 
 #[derive(Default)]
 pub struct ChunkHandlerServiceImpl {}
@@ -32,8 +36,8 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         Ok(Response::new(reply))
     }
 
-    type HeartbeatResponseStream =
-        Pin<Box<dyn Stream<Item = Result<HeartbeatResponse, Status>> + Send>>;
+    // type HeartbeatResponseStream =
+    //     Pin<Box<dyn Stream<Item = Result<HeartbeatResponse, Status>> + Send>>;
 
     async fn heartbeat(
         &self,

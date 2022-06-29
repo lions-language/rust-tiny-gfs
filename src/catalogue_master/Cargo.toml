@@ -12,6 +12,8 @@ bytes = "1.1"
 tokio = { version = "1.19", features = ["rt-multi-thread"] }
 tokio-stream = { version = "0.1" }
 
+futures = "0.3"
+
 serde = { version = "1.0", features = ["derive"] }
 prost = { version = "0.10", features = ["default"] }
 tonic = { version = "0.7", features = ["default"] }
