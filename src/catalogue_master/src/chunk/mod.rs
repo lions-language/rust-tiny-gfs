@@ -21,8 +21,15 @@ use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 type HeartbeatResponseStream =
     Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
-#[derive(Default)]
-pub struct ChunkHandlerServiceImpl {}
+pub struct ChunkHandlerServiceImpl {
+    storage: Box<dyn Storage>,
+}
+
+impl ChunkHandlerServiceImpl {
+    pub fn new(storage: Box<dyn Storage>) -> Self {
+        Self { storage: storage }
+    }
+}
 
 #[tonic::async_trait]
 impl ChunkHandlerService for ChunkHandlerServiceImpl {
@@ -76,12 +83,12 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     }
 }
 
-pub struct ChunkHandler {
-    storage: Box<dyn Storage>,
-}
+pub struct ChunkHandler {}
 
 impl ChunkHandler {
-    pub fn start(&mut self) -> Result<()> {
+    pub fn start(&mut self, storage_mode: StorageMode) -> Result<()> {
+        let storage = StorageFactory::new_storage(storage_mode)?;
+
         use tokio::runtime::Runtime;
         let rt = Runtime::new()?;
 
@@ -103,9 +110,7 @@ impl ChunkHandler {
         unimplemented!();
     }
 
-    pub fn new(storage_mode: StorageMode) -> Result<Self> {
-        Ok(Self {
-            storage: StorageFactory::new_storage(storage_mode)?,
-        })
+    pub fn new() -> Result<Self> {
+        Ok(Self {})
     }
 }
