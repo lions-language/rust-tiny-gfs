@@ -19,7 +19,7 @@ use std::{pin::Pin, time::Duration};
 use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 type HeartbeatResponseStream =
-    Pin<Box<dyn Stream<Item = Result<HeartbeatResponse, Status>> + Send>>;
+    Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
 #[derive(Default)]
 pub struct ChunkHandlerServiceImpl {}
@@ -42,12 +42,12 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     async fn heartbeat(
         &self,
         request: Request<Streaming<HeartbeatRequest>>,
-    ) -> Result<Response<HeartbeatResponse>, Status> {
+    ) -> std::result::Result<Response<HeartbeatResponse>, Status> {
         println!("\tclient connected from: {:?}", request.remote_addr());
 
         // creating infinite stream with requested message
         let repeat = std::iter::repeat(HeartbeatResponse {
-            message: req.into_inner().message,
+            // message: request.into_inner().message,
         });
         let mut stream = Box::pin(tokio_stream::iter(repeat).throttle(Duration::from_millis(200)));
 
@@ -56,7 +56,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         let (tx, rx) = mpsc::channel(128);
         tokio::spawn(async move {
             while let Some(item) = stream.next().await {
-                match tx.send(Result::<_, Status>::Ok(item)).await {
+                match tx.send(std::result::Result::<_, Status>::Ok(item)).await {
                     Ok(_) => {
                         // item (server response) was queued to be send to client
                     }
@@ -71,7 +71,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 
         let output_stream = ReceiverStream::new(rx);
         Ok(Response::new(
-            Box::pin(output_stream) as Self::HeartbeatResponseStream
+            Box::pin(output_stream) as HeartbeatResponseStream
         ))
     }
 }

@@ -16,6 +16,6 @@ message HeartbeatResponse {
 
 service ChunkHandlerService {
   rpc register(RegisterRequest) returns (RegisterResponse) {}
-  rpc heartbeat(stream HeartbeatRequest) returns (HeartbeatResponse) {}
+  rpc heartbeat(stream HeartbeatRequest) returns (stream HeartbeatResponse) {}
 }
 
