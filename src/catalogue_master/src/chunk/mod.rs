@@ -36,13 +36,13 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         Ok(Response::new(reply))
     }
 
-    // type HeartbeatResponseStream =
-    //     Pin<Box<dyn Stream<Item = Result<HeartbeatResponse, Status>> + Send>>;
+    type heartbeatStream =
+        Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
     async fn heartbeat(
         &self,
         request: Request<Streaming<HeartbeatRequest>>,
-    ) -> std::result::Result<Response<HeartbeatResponse>, Status> {
+    ) -> std::result::Result<Response<Self::heartbeatStream>, Status> {
         println!("\tclient connected from: {:?}", request.remote_addr());
 
         // creating infinite stream with requested message
@@ -71,7 +71,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 
         let output_stream = ReceiverStream::new(rx);
         Ok(Response::new(
-            Box::pin(output_stream) as HeartbeatResponseStream
+            Box::pin(output_stream) as Self::heartbeatStream
         ))
     }
 }

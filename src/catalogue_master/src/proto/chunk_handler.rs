@@ -100,7 +100,10 @@ pub mod chunk_handler_service_client {
         pub async fn heartbeat(
             &mut self,
             request: impl tonic::IntoStreamingRequest<Message = super::HeartbeatRequest>,
-        ) -> Result<tonic::Response<super::HeartbeatResponse>, tonic::Status> {
+        ) -> Result<
+            tonic::Response<tonic::codec::Streaming<super::HeartbeatResponse>>,
+            tonic::Status,
+        > {
             self.inner
                 .ready()
                 .await
@@ -114,9 +117,7 @@ pub mod chunk_handler_service_client {
             let path = http::uri::PathAndQuery::from_static(
                 "/chunk_handler.ChunkHandlerService/heartbeat",
             );
-            self.inner
-                .client_streaming(request.into_streaming_request(), path, codec)
-                .await
+            self.inner.streaming(request.into_streaming_request(), path, codec).await
         }
     }
 }
@@ -131,10 +132,16 @@ pub mod chunk_handler_service_server {
             &self,
             request: tonic::Request<super::RegisterRequest>,
         ) -> Result<tonic::Response<super::RegisterResponse>, tonic::Status>;
+        ///Server streaming response type for the heartbeat method.
+        type heartbeatStream: futures_core::Stream<
+                Item = Result<super::HeartbeatResponse, tonic::Status>,
+            >
+            + Send
+            + 'static;
         async fn heartbeat(
             &self,
             request: tonic::Request<tonic::Streaming<super::HeartbeatRequest>>,
-        ) -> Result<tonic::Response<super::HeartbeatResponse>, tonic::Status>;
+        ) -> Result<tonic::Response<Self::heartbeatStream>, tonic::Status>;
     }
     #[derive(Debug)]
     pub struct ChunkHandlerServiceServer<T: ChunkHandlerService> {
@@ -226,11 +233,12 @@ pub mod chunk_handler_service_server {
                     struct heartbeatSvc<T: ChunkHandlerService>(pub Arc<T>);
                     impl<
                         T: ChunkHandlerService,
-                    > tonic::server::ClientStreamingService<super::HeartbeatRequest>
+                    > tonic::server::StreamingService<super::HeartbeatRequest>
                     for heartbeatSvc<T> {
                         type Response = super::HeartbeatResponse;
+                        type ResponseStream = T::heartbeatStream;
                         type Future = BoxFuture<
-                            tonic::Response<Self::Response>,
+                            tonic::Response<Self::ResponseStream>,
                             tonic::Status,
                         >;
                         fn call(
@@ -256,7 +264,7 @@ pub mod chunk_handler_service_server {
                                 accept_compression_encodings,
                                 send_compression_encodings,
                             );
-                        let res = grpc.client_streaming(method, req).await;
+                        let res = grpc.streaming(method, req).await;
                         Ok(res)
                     };
                     Box::pin(fut)
