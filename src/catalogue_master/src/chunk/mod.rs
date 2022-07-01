@@ -6,10 +6,11 @@ use crate::Result;
 use storage::{Storage, StorageFactory};
 
 use futures::Stream;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, Mutex};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
+use std::sync::Arc;
 use std::{pin::Pin, time::Duration};
 
 // pub mod chunk_handler {
@@ -22,11 +23,11 @@ type HeartbeatResponseStream =
     Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
 pub struct ChunkHandlerServiceImpl {
-    storage: Box<dyn Storage>,
+    storage: Arc<Mutex<Pin<Box<dyn Storage>>>>,
 }
 
 impl ChunkHandlerServiceImpl {
-    pub fn new(storage: Box<dyn Storage>) -> Self {
+    pub fn new(storage: Arc<Mutex<Pin<Box<dyn Storage>>>>) -> Self {
         Self { storage: storage }
     }
 }
@@ -93,7 +94,7 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let s = ChunkHandlerServiceImpl::default();
+        let s = ChunkHandlerServiceImpl::new(Arc::new(Mutex::new(storage)));
 
         rt.block_on(async {
             Server::builder()
