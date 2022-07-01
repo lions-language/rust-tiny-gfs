@@ -22,13 +22,11 @@ use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 type HeartbeatResponseStream =
     Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
-pub struct ChunkHandlerServiceImpl {
-    storage: Arc<Mutex<Pin<Box<dyn Storage>>>>,
-}
+pub struct ChunkHandlerServiceImpl {}
 
 impl ChunkHandlerServiceImpl {
-    pub fn new(storage: Arc<Mutex<Pin<Box<dyn Storage>>>>) -> Self {
-        Self { storage: storage }
+    pub fn new() -> Self {
+        Self {}
     }
 }
 
@@ -84,7 +82,9 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     }
 }
 
-pub struct ChunkHandler {}
+pub struct ChunkHandler {
+    storage: Arc<Mutex<Pin<Box<dyn Storage>>>>,
+}
 
 impl ChunkHandler {
     pub fn start(&mut self, storage_mode: StorageMode) -> Result<()> {
@@ -94,7 +94,7 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let s = ChunkHandlerServiceImpl::new(Arc::new(Mutex::new(storage)));
+        let s = ChunkHandlerServiceImpl::new();
 
         rt.block_on(async {
             Server::builder()
@@ -111,7 +111,7 @@ impl ChunkHandler {
         unimplemented!();
     }
 
-    pub fn new() -> Result<Self> {
-        Ok(Self {})
+    fn new(storage: Arc<Mutex<Pin<Box<dyn Storage>>>>) -> Result<Self> {
+        Ok(Self { storage: storage })
     }
 }
