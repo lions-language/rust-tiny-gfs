@@ -10,7 +10,7 @@ pub enum StorageMode {
 pub(crate) struct StorageFactory {}
 
 impl StorageFactory {
-    pub(crate) fn new_storage(mode: StorageMode) -> Result<Box<dyn Storage>> {
+    pub(crate) fn new_storage(mode: StorageMode) -> Result<Box<dyn Storage + Sync + Send>> {
         match mode {
             StorageMode::Memory => Ok(Box::new(Memory::new())),
         }

@@ -46,11 +46,13 @@ fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
 type HeartbeatResponseStream =
     Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
-pub struct ChunkHandlerServiceImpl {}
+pub struct ChunkHandlerServiceImpl {
+    storage: Arc<Mutex<Box<dyn Storage + Sync + Send>>>,
+}
 
 impl ChunkHandlerServiceImpl {
-    pub fn new() -> Self {
-        Self {}
+    fn new(storage: Arc<Mutex<Box<dyn Storage + Sync + Send>>>) -> Self {
+        Self { storage: storage }
     }
 }
 
@@ -143,7 +145,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 }
 
 pub struct ChunkHandler {
-    storage: Arc<Mutex<Pin<Box<dyn Storage>>>>,
+    storage: Arc<Mutex<Box<dyn Storage + Sync>>>,
 }
 
 impl ChunkHandler {
@@ -154,7 +156,7 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let s = ChunkHandlerServiceImpl::new();
+        let s = ChunkHandlerServiceImpl::new(Arc::new(Mutex::new(storage)));
 
         rt.block_on(async {
             Server::builder()
@@ -171,7 +173,7 @@ impl ChunkHandler {
         unimplemented!();
     }
 
-    fn new(storage: Arc<Mutex<Pin<Box<dyn Storage>>>>) -> Result<Self> {
+    fn new(storage: Arc<Mutex<Box<dyn Storage + Sync>>>) -> Result<Self> {
         Ok(Self { storage: storage })
     }
 }
