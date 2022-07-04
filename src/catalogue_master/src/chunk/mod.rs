@@ -10,6 +10,7 @@ use tokio::sync::{mpsc, Mutex};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
+use std::collections::HashSet;
 use std::sync::Arc;
 use std::{error::Error, io::ErrorKind};
 use std::{pin::Pin, time::Duration};
@@ -43,11 +44,23 @@ fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
     }
 }
 
+struct HeartbeatBuffer {
+    chunk_ids: Arc<Mutex<HashSet<String>>>,
+}
+
+impl HeartbeatBuffer {
+    fn new() -> Self {
+        Self {
+            chunk_ids: Arc::new(Mutex::new(HashSet::new())),
+        }
+    }
+}
+
 type HeartbeatResponseStream =
     Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
 pub struct ChunkHandlerServiceImpl {
-    storage: Arc<Mutex<Box<dyn Storage + Sync + Send>>>,
+    heartbeat_buffer: Arc<Mutex<HeartbeatBuffer>>,
 }
 
 impl ChunkHandlerServiceImpl {
@@ -55,8 +68,10 @@ impl ChunkHandlerServiceImpl {
         unimplemented!();
     }
 
-    fn new(storage: Arc<Mutex<Box<dyn Storage + Sync + Send>>>) -> Self {
-        Self { storage: storage }
+    fn new() -> Self {
+        Self {
+            heartbeat_buffer: Arc::new(Mutex::new(HeartbeatBuffer::new())),
+        }
     }
 }
 
@@ -75,42 +90,6 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     type heartbeatStream =
         Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
-    // async fn heartbeat(
-    //     &self,
-    //     request: Request<Streaming<HeartbeatRequest>>,
-    // ) -> std::result::Result<Response<Self::heartbeatStream>, Status> {
-    //     println!("\tclient connected from: {:?}", request.remote_addr());
-
-    //     // creating infinite stream with requested message
-    //     let repeat = std::iter::repeat(HeartbeatResponse {
-    //         // message: request.into_inner().message,
-    //     });
-    //     let mut stream = Box::pin(tokio_stream::iter(repeat).throttle(Duration::from_millis(200)));
-
-    //     // spawn and channel are required if you want handle "disconnect" functionality
-    //     // the `out_stream` will not be polled after client disconnect
-    //     let (tx, rx) = mpsc::channel(128);
-    //     tokio::spawn(async move {
-    //         while let Some(item) = stream.next().await {
-    //             match tx.send(std::result::Result::<_, Status>::Ok(item)).await {
-    //                 Ok(_) => {
-    //                     // item (server response) was queued to be send to client
-    //                 }
-    //                 Err(_item) => {
-    //                     // output_stream was build from rx and both are dropped
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //         println!("\tclient disconnected");
-    //     });
-
-    //     let output_stream = ReceiverStream::new(rx);
-    //     Ok(Response::new(
-    //         Box::pin(output_stream) as Self::heartbeatStream
-    //     ))
-    // }
-
     async fn heartbeat(
         &self,
         request: Request<Streaming<HeartbeatRequest>>,
@@ -124,10 +103,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
             while let Some(item) = in_stream.next().await {
                 match item {
                     Ok(v) => {
-                        self.tx
-                            .send(Ok(HeartbeatResponse {}))
-                            .await
-                            .expect("working rx");
+                        tx.send(Ok(HeartbeatResponse {})).await.expect("working rx");
                     }
                     Err(err) => {
                         if let Some(io_err) = match_for_io_error(&err) {
@@ -165,7 +141,7 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let s = ChunkHandlerServiceImpl::new(Arc::new(Mutex::new(storage)));
+        let s = ChunkHandlerServiceImpl::new();
 
         rt.block_on(async {
             Server::builder()
