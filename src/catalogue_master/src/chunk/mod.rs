@@ -51,6 +51,10 @@ pub struct ChunkHandlerServiceImpl {
 }
 
 impl ChunkHandlerServiceImpl {
+    fn handle_heartbeat(&mut self) -> Result<()> {
+        unimplemented!();
+    }
+
     fn new(storage: Arc<Mutex<Box<dyn Storage + Sync + Send>>>) -> Self {
         Self { storage: storage }
     }
@@ -119,7 +123,12 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         tokio::spawn(async move {
             while let Some(item) = in_stream.next().await {
                 match item {
-                    Ok(v) => tx.send(Ok(HeartbeatResponse {})).await.expect("working rx"),
+                    Ok(v) => {
+                        self.tx
+                            .send(Ok(HeartbeatResponse {}))
+                            .await
+                            .expect("working rx");
+                    }
                     Err(err) => {
                         if let Some(io_err) = match_for_io_error(&err) {
                             if io_err.kind() == ErrorKind::BrokenPipe {
@@ -167,10 +176,6 @@ impl ChunkHandler {
         });
 
         Ok(())
-    }
-
-    fn handle_heartbeat(&mut self) -> Result<()> {
-        unimplemented!();
     }
 
     fn new(storage: Arc<Mutex<Box<dyn Storage + Sync>>>) -> Result<Self> {
