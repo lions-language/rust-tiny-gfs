@@ -10,6 +10,8 @@ use tokio::sync::{mpsc, Mutex};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
+use log::{error, info, warn};
+
 use std::collections::HashSet;
 use std::sync::Arc;
 use std::{error::Error, io::ErrorKind};
@@ -81,7 +83,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         &self,
         request: Request<RegisterRequest>,
     ) -> std::result::Result<Response<RegisterResponse>, Status> {
-        println!("Got a request from {:?}", request.remote_addr());
+        info!("Got a request from {:?}", request.remote_addr());
 
         let reply = RegisterResponse {};
         Ok(Response::new(reply))
@@ -94,7 +96,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         &self,
         request: Request<Streaming<HeartbeatRequest>>,
     ) -> std::result::Result<Response<Self::heartbeatStream>, Status> {
-        println!("\tclient connected from: {:?}", request.remote_addr());
+        info!("\tclient connected from: {:?}", request.remote_addr());
 
         let mut in_stream = request.into_inner();
         let (tx, rx) = mpsc::channel(128);
@@ -108,7 +110,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
                     Err(err) => {
                         if let Some(io_err) = match_for_io_error(&err) {
                             if io_err.kind() == ErrorKind::BrokenPipe {
-                                eprintln!("client disconnected: broken pipe");
+                                error!("client disconnected: broken pipe");
                                 break;
                             }
                         }
@@ -120,7 +122,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
                     }
                 }
             }
-            println!("stream ended");
+            info!("stream ended");
         });
 
         let out_stream = ReceiverStream::new(rx);
@@ -142,6 +144,13 @@ impl ChunkHandler {
 
         let addr = "[::1]:10000".parse().unwrap();
         let s = ChunkHandlerServiceImpl::new();
+
+        // log
+        use async_logger_log::Logger;
+        let logger = Logger::new("./logs/chunk_handler.go", 256, 10 * 1024 * 1024)
+            .expect("Failed to create Logger instance");
+
+        info!("start success");
 
         rt.block_on(async {
             Server::builder()
