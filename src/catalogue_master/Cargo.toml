@@ -20,7 +20,7 @@ serde = { version = "1.0", features = ["derive"] }
 prost = { version = "0.10", features = ["default"] }
 tonic = { version = "0.7", features = ["default"] }
 
-async_logger_log = "0.2"
+log4rs = "1.1"
 log = "0.4"
 
 [build-dependencies]

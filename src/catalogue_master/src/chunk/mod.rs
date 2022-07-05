@@ -131,9 +131,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     }
 }
 
-pub struct ChunkHandler {
-    storage: Arc<Mutex<Box<dyn Storage + Sync>>>,
-}
+pub struct ChunkHandler {}
 
 impl ChunkHandler {
     pub fn start(&mut self, storage_mode: StorageMode) -> Result<()> {
@@ -146,9 +144,12 @@ impl ChunkHandler {
         let s = ChunkHandlerServiceImpl::new();
 
         // log
-        use async_logger_log::Logger;
-        let logger = Logger::new("./logs/chunk_handler.go", 256, 10 * 1024 * 1024)
-            .expect("Failed to create Logger instance");
+        let requests = log4rs::append::file::FileAppender::builder()
+            .encoder(Box::new(log4rs::encode::pattern::PatternEncoder::new(
+                "{d} - {m}{n}",
+            )))
+            .build("logs/chunk_handler.log")
+            .unwrap();
 
         info!("start success");
 
@@ -163,7 +164,7 @@ impl ChunkHandler {
         Ok(())
     }
 
-    fn new(storage: Arc<Mutex<Box<dyn Storage + Sync>>>) -> Result<Self> {
-        Ok(Self { storage: storage })
+    pub fn new() -> Self {
+        Self {}
     }
 }

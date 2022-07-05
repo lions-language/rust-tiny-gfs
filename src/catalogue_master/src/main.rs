@@ -1,3 +1,6 @@
+use catalogue_master::{ChunkHandler, ChunkStorageMode};
+
 fn main() {
-    println!("Hello, world!");
+    let mut chunk_handler = ChunkHandler::new();
+    chunk_handler.start(ChunkStorageMode::Memory).unwrap();
 }
