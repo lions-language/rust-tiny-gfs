@@ -96,21 +96,30 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
         &self,
         request: Request<Streaming<HeartbeatRequest>>,
     ) -> std::result::Result<Response<Self::heartbeatStream>, Status> {
-        info!("\tclient connected from: {:?}", request.remote_addr());
+        info!(
+            "client heart-beat connected from: {:?}",
+            request.remote_addr()
+        );
+
+        let mut buffer = self.heartbeat_buffer.clone();
 
         let mut in_stream = request.into_inner();
         let (tx, rx) = mpsc::channel(128);
 
         tokio::spawn(async move {
             while let Some(item) = in_stream.next().await {
+                let mut buffer = buffer.clone();
+
                 match item {
                     Ok(v) => {
-                        tx.send(Ok(HeartbeatResponse {})).await.expect("working rx");
+                        tx.send(Ok(HeartbeatResponse::new_ok()))
+                            .await
+                            .expect("working rx");
                     }
                     Err(err) => {
                         if let Some(io_err) = match_for_io_error(&err) {
                             if io_err.kind() == ErrorKind::BrokenPipe {
-                                error!("client disconnected: broken pipe");
+                                error!("client heart-beat disconnected: broken pipe");
                                 break;
                             }
                         }
@@ -122,7 +131,8 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
                     }
                 }
             }
-            info!("stream ended");
+
+            info!("heart-beat stream ended");
         });
 
         let out_stream = ReceiverStream::new(rx);
@@ -172,7 +182,7 @@ impl ChunkHandler {
 
         log4rs::init_config(config).unwrap();
 
-        info!("start success");
+        info!("chunk handler start success");
 
         rt.block_on(async {
             Server::builder()

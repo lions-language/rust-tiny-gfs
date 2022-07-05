@@ -9,9 +9,12 @@ message RegisterResponse {
 }
 
 message HeartbeatRequest {
+    string chunk_id = 1;
 }
 
 message HeartbeatResponse {
+    int32 code = 1;
+    string meg = 2;
 }
 
 service ChunkHandlerService {
