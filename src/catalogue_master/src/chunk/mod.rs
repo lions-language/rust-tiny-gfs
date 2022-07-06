@@ -6,13 +6,13 @@ use crate::Result;
 use storage::{Storage, StorageFactory};
 
 use futures::Stream;
-use tokio::sync::{mpsc, Mutex};
+use tokio::sync::{mpsc, RwLock};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
 use log::{error, info, warn};
 
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::{error::Error, io::ErrorKind};
 use std::{pin::Pin, time::Duration};
@@ -47,13 +47,23 @@ fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
 }
 
 struct HeartbeatBuffer {
-    chunk_ids: Arc<Mutex<HashSet<String>>>,
+    chunk_ids: HashMap<String, i64>,
 }
 
 impl HeartbeatBuffer {
+    fn update(&mut self, chunk_id: &str) {
+        let t = 1000;
+        match self.chunk_ids.get_mut(chunk_id) {
+            Some(t) => {}
+            None => {
+                self.chunk_ids.insert(chunk_id.into(), t);
+            }
+        }
+    }
+
     fn new() -> Self {
         Self {
-            chunk_ids: Arc::new(Mutex::new(HashSet::new())),
+            chunk_ids: HashMap::new(),
         }
     }
 }
@@ -62,7 +72,7 @@ type HeartbeatResponseStream =
     Pin<Box<dyn Stream<Item = std::result::Result<HeartbeatResponse, Status>> + Send>>;
 
 pub struct ChunkHandlerServiceImpl {
-    heartbeat_buffer: Arc<Mutex<HeartbeatBuffer>>,
+    heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>,
 }
 
 impl ChunkHandlerServiceImpl {
@@ -72,7 +82,7 @@ impl ChunkHandlerServiceImpl {
 
     fn new() -> Self {
         Self {
-            heartbeat_buffer: Arc::new(Mutex::new(HeartbeatBuffer::new())),
+            heartbeat_buffer: Arc::new(RwLock::new(HeartbeatBuffer::new())),
         }
     }
 }
@@ -112,6 +122,9 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 
                 match item {
                     Ok(v) => {
+                        let mut b = buffer.write().await;
+                        b.update(&v.chunk_id);
+
                         tx.send(Ok(HeartbeatResponse::new_ok()))
                             .await
                             .expect("working rx");
