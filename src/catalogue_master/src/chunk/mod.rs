@@ -47,14 +47,20 @@ fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
 }
 
 struct HeartbeatBuffer {
-    chunk_ids: HashMap<String, i64>,
+    chunk_ids: HashMap<String, u64>,
 }
 
 impl HeartbeatBuffer {
     fn update(&mut self, chunk_id: &str) {
-        let t = 1000;
+        use std::time::*;
+        let t = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .expect("successful get timestamp")
+            .as_secs();
         match self.chunk_ids.get_mut(chunk_id) {
-            Some(t) => {}
+            Some(v) => {
+                *v = t;
+            }
             None => {
                 self.chunk_ids.insert(chunk_id.into(), t);
             }
@@ -165,6 +171,11 @@ impl ChunkHandler {
 
         let addr = "[::1]:10000".parse().unwrap();
         let s = ChunkHandlerServiceImpl::new();
+
+        if let Err(err) = s.start() {
+            error!("chunk handler service start failed");
+            return err;
+        }
 
         // log
         let chunk_handler_log = log4rs::append::file::FileAppender::builder()
