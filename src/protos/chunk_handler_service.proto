@@ -14,7 +14,7 @@ message HeartbeatRequest {
 
 message HeartbeatResponse {
     int32 code = 1;
-    string meg = 2;
+    string msg = 2;
 }
 
 service ChunkHandlerService {

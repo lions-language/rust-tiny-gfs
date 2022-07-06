@@ -9,10 +9,16 @@ pub struct RegisterResponse {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeartbeatRequest {
+    #[prost(string, tag="1")]
+    pub chunk_id: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct HeartbeatResponse {
+    #[prost(int32, tag="1")]
+    pub code: i32,
+    #[prost(string, tag="2")]
+    pub msg: ::prost::alloc::string::String,
 }
 /// Generated client implementations.
 pub mod chunk_handler_service_client {
