@@ -2,7 +2,7 @@ mod storage;
 
 pub use storage::StorageMode;
 
-use crate::Result;
+use crate::{Error, Result};
 use storage::{Storage, StorageFactory};
 
 use futures::Stream;
@@ -14,7 +14,7 @@ use log::{error, info, warn};
 
 use std::collections::HashMap;
 use std::sync::Arc;
-use std::{error::Error, io::ErrorKind};
+use std::{error::Error as StdError, io::ErrorKind};
 use std::{pin::Pin, time::Duration};
 
 // pub mod chunk_handler {
@@ -24,7 +24,7 @@ use std::{pin::Pin, time::Duration};
 use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
-    let mut err: &(dyn Error + 'static) = err_status;
+    let mut err: &(dyn StdError + 'static) = err_status;
 
     loop {
         if let Some(io_err) = err.downcast_ref::<std::io::Error>() {
@@ -83,6 +83,10 @@ pub struct ChunkHandlerServiceImpl {
 
 impl ChunkHandlerServiceImpl {
     fn handle_heartbeat(&mut self) -> Result<()> {
+        unimplemented!();
+    }
+
+    fn start(&mut self) -> Result<()> {
         unimplemented!();
     }
 
@@ -170,11 +174,11 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let s = ChunkHandlerServiceImpl::new();
+        let mut s = ChunkHandlerServiceImpl::new();
 
         if let Err(err) = s.start() {
             error!("chunk handler service start failed");
-            return err;
+            return Err(err);
         }
 
         // log
