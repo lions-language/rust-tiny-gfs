@@ -87,7 +87,12 @@ impl ChunkHandlerServiceImpl {
     }
 
     fn start(&mut self) -> Result<()> {
-        unimplemented!();
+        std::thread::swap(|| {
+            use tokio::runtime::Runtime;
+            let rt = Runtime::new().unwrap();
+
+            rt.block_on(async {});
+        });
     }
 
     fn new() -> Self {
