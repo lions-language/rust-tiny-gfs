@@ -7,15 +7,16 @@ use storage::{Storage, StorageFactory};
 
 use futures::Stream;
 use tokio::sync::{mpsc, RwLock};
+use tokio::time::{self, Duration};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
 use log::{error, info, warn};
 
 use std::collections::HashMap;
+use std::pin::Pin;
 use std::sync::Arc;
 use std::{error::Error as StdError, io::ErrorKind};
-use std::{pin::Pin, time::Duration};
 
 // pub mod chunk_handler {
 //     tonic::include_proto!("/proto/chunk_handler_service");
@@ -82,17 +83,33 @@ pub struct ChunkHandlerServiceImpl {
 }
 
 impl ChunkHandlerServiceImpl {
-    fn handle_heartbeat(&mut self) -> Result<()> {
+    async fn handle_heartbeat() {
         unimplemented!();
     }
 
     fn start(&mut self) -> Result<()> {
-        std::thread::swap(|| {
+        std::thread::spawn(|| {
             use tokio::runtime::Runtime;
             let rt = Runtime::new().unwrap();
 
-            rt.block_on(async {});
+            rt.block_on(async {
+                let sleep = time::sleep(Duration::from_millis(1000));
+                tokio::pin!(sleep);
+
+                loop {
+                    tokio::select! {
+                        _ = &mut sleep => {
+                            println!("operation timed out");
+                        }
+                        // _ = some_async_work() => {
+                        //     println!("operation completed");
+                        // }
+                    }
+                }
+            })
         });
+
+        Ok(())
     }
 
     fn new() -> Self {
