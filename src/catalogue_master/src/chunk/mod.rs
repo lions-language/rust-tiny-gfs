@@ -7,7 +7,7 @@ use storage::{Storage, StorageFactory};
 
 use futures::Stream;
 use tokio::sync::{mpsc, RwLock};
-use tokio::time::{self, Duration};
+use tokio::time::{self, Duration, Interval};
 use tokio_stream::{wrappers::ReceiverStream, StreamExt};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
@@ -93,13 +93,14 @@ impl ChunkHandlerServiceImpl {
             let rt = Runtime::new().unwrap();
 
             rt.block_on(async {
-                let sleep = time::sleep(Duration::from_millis(1000));
+                let mut sleep = time::sleep(Duration::from_millis(1000));
                 tokio::pin!(sleep);
 
                 loop {
                     tokio::select! {
                         _ = &mut sleep => {
                             println!("operation timed out");
+                            sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
                         }
                         // _ = some_async_work() => {
                         //     println!("operation completed");
