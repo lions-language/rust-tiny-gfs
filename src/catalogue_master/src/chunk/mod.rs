@@ -85,7 +85,6 @@ pub struct ChunkHandlerServiceImpl {
 impl ChunkHandlerServiceImpl {
     async fn handle_heartbeat(hb: Arc<RwLock<HeartbeatBuffer>>) {
         info!("handle heartbeat");
-        unimplemented!();
     }
 
     fn start(&mut self) -> Result<()> {
@@ -101,13 +100,12 @@ impl ChunkHandlerServiceImpl {
                 let mut sleep = time::sleep(Duration::from_millis(1000));
                 tokio::pin!(sleep);
 
-
                 loop {
                     let hb = hb.clone();
 
                     tokio::select! {
                         _ = &mut sleep => {
-                            ChunkHandlerServiceImpl::handle_heartbeat(hb);
+                            ChunkHandlerServiceImpl::handle_heartbeat(hb).await;
                             sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
                         }
                         // _ = some_async_work() => {
