@@ -83,23 +83,31 @@ pub struct ChunkHandlerServiceImpl {
 }
 
 impl ChunkHandlerServiceImpl {
-    async fn handle_heartbeat() {
+    async fn handle_heartbeat(hb: Arc<RwLock<HeartbeatBuffer>>) {
+        info!("handle heartbeat");
         unimplemented!();
     }
 
     fn start(&mut self) -> Result<()> {
-        std::thread::spawn(|| {
+        let hb = self.heartbeat_buffer.clone();
+
+        std::thread::spawn(move || {
             use tokio::runtime::Runtime;
             let rt = Runtime::new().unwrap();
+
+            let hb = hb.clone();
 
             rt.block_on(async {
                 let mut sleep = time::sleep(Duration::from_millis(1000));
                 tokio::pin!(sleep);
 
+
                 loop {
+                    let hb = hb.clone();
+
                     tokio::select! {
                         _ = &mut sleep => {
-                            println!("operation timed out");
+                            ChunkHandlerServiceImpl::handle_heartbeat(hb);
                             sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
                         }
                         // _ = some_async_work() => {
