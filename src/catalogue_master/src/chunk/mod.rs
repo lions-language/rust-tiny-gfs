@@ -68,6 +68,12 @@ impl HeartbeatBuffer {
         }
     }
 
+    fn fetch_all(&mut self) -> HashMap<String, u64> {
+        let ids = self.chunk_ids.clone();
+        self.chunk_ids.clear();
+        ids
+    }
+
     fn new() -> Self {
         Self {
             chunk_ids: HashMap::new(),
@@ -162,18 +168,31 @@ pub struct ChunkHandler {
 }
 
 impl ChunkHandler {
-    async fn handle_heartbeat(hb: Arc<RwLock<HeartbeatBuffer>>) {
+    async fn handle_heartbeat(
+        hb: Arc<RwLock<HeartbeatBuffer>>,
+        storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
+    ) {
         info!("handle heartbeat");
+
+        let chunks_heartbeat_data = hb.write().await.fetch_all();
+
+        storage
+            .write()
+            .await
+            .update_state_multi(chunks_heartbeat_data)
+            .await;
     }
 
     fn start_async_tasks(&mut self, heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>) -> Result<()> {
         let hb = heartbeat_buffer;
+        let storage = self.storage.clone();
 
         std::thread::spawn(move || {
             use tokio::runtime::Runtime;
             let rt = Runtime::new().unwrap();
 
             let hb = hb.clone();
+            let storage = storage.clone();
 
             rt.block_on(async {
                 let mut sleep = time::sleep(Duration::from_millis(1000));
@@ -181,10 +200,11 @@ impl ChunkHandler {
 
                 loop {
                     let hb = hb.clone();
+                    let storage = storage.clone();
 
                     tokio::select! {
                         _ = &mut sleep => {
-                            ChunkHandler::handle_heartbeat(hb).await;
+                            ChunkHandler::handle_heartbeat(hb, storage).await;
                             sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
                         }
                         // _ = some_async_work() => {
