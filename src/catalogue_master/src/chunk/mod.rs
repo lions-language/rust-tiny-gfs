@@ -83,45 +83,9 @@ pub struct ChunkHandlerServiceImpl {
 }
 
 impl ChunkHandlerServiceImpl {
-    async fn handle_heartbeat(hb: Arc<RwLock<HeartbeatBuffer>>) {
-        info!("handle heartbeat");
-    }
-
-    fn start(&mut self) -> Result<()> {
-        let hb = self.heartbeat_buffer.clone();
-
-        std::thread::spawn(move || {
-            use tokio::runtime::Runtime;
-            let rt = Runtime::new().unwrap();
-
-            let hb = hb.clone();
-
-            rt.block_on(async {
-                let mut sleep = time::sleep(Duration::from_millis(1000));
-                tokio::pin!(sleep);
-
-                loop {
-                    let hb = hb.clone();
-
-                    tokio::select! {
-                        _ = &mut sleep => {
-                            ChunkHandlerServiceImpl::handle_heartbeat(hb).await;
-                            sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
-                        }
-                        // _ = some_async_work() => {
-                        //     println!("operation completed");
-                        // }
-                    }
-                }
-            })
-        });
-
-        Ok(())
-    }
-
-    fn new() -> Self {
+    fn new(heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>) -> Self {
         Self {
-            heartbeat_buffer: Arc::new(RwLock::new(HeartbeatBuffer::new())),
+            heartbeat_buffer: heartbeat_buffer,
         }
     }
 }
@@ -196,6 +160,42 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 pub struct ChunkHandler {}
 
 impl ChunkHandler {
+    async fn handle_heartbeat(hb: Arc<RwLock<HeartbeatBuffer>>) {
+        info!("handle heartbeat");
+    }
+
+    fn start_async_tasks(&mut self, heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>) -> Result<()> {
+        let hb = heartbeat_buffer;
+
+        std::thread::spawn(move || {
+            use tokio::runtime::Runtime;
+            let rt = Runtime::new().unwrap();
+
+            let hb = hb.clone();
+
+            rt.block_on(async {
+                let mut sleep = time::sleep(Duration::from_millis(1000));
+                tokio::pin!(sleep);
+
+                loop {
+                    let hb = hb.clone();
+
+                    tokio::select! {
+                        _ = &mut sleep => {
+                            ChunkHandler::handle_heartbeat(hb).await;
+                            sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
+                        }
+                        // _ = some_async_work() => {
+                        //     println!("operation completed");
+                        // }
+                    }
+                }
+            })
+        });
+
+        Ok(())
+    }
+
     pub fn start(&mut self, storage_mode: StorageMode) -> Result<()> {
         let storage = StorageFactory::new_storage(storage_mode)?;
 
@@ -203,9 +203,10 @@ impl ChunkHandler {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10000".parse().unwrap();
-        let mut s = ChunkHandlerServiceImpl::new();
+        let heartbeat_buffer = Arc::new(RwLock::new(HeartbeatBuffer::new()));
+        let mut s = ChunkHandlerServiceImpl::new(heartbeat_buffer.clone());
 
-        if let Err(err) = s.start() {
+        if let Err(err) = self.start_async_tasks(heartbeat_buffer) {
             error!("chunk handler service start failed");
             return Err(err);
         }
