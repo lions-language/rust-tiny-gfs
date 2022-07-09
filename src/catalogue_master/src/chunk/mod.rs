@@ -157,7 +157,9 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     }
 }
 
-pub struct ChunkHandler {}
+pub struct ChunkHandler {
+    storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
+}
 
 impl ChunkHandler {
     async fn handle_heartbeat(hb: Arc<RwLock<HeartbeatBuffer>>) {
@@ -196,9 +198,7 @@ impl ChunkHandler {
         Ok(())
     }
 
-    pub fn start(&mut self, storage_mode: StorageMode) -> Result<()> {
-        let storage = StorageFactory::new_storage(storage_mode)?;
-
+    pub fn start(&mut self) -> Result<()> {
         use tokio::runtime::Runtime;
         let rt = Runtime::new()?;
 
@@ -253,7 +253,9 @@ impl ChunkHandler {
         Ok(())
     }
 
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(storage_mode: StorageMode) -> Result<Self> {
+        Ok(Self {
+            storage: Arc::new(RwLock::new(StorageFactory::new_storage(storage_mode)?)),
+        })
     }
 }
