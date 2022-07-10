@@ -1,5 +1,7 @@
 mod memory;
 
+use std::collections::HashMap;
+
 use crate::{Chunk, ChunkId, Result};
 use memory::Memory;
 
@@ -17,7 +19,9 @@ impl StorageFactory {
     }
 }
 
+#[tonic::async_trait]
 pub(crate) trait Storage {
     fn insert(&mut self, chunk_id: &ChunkId, chunk: Chunk) -> Result<()>;
     fn find(&self, chunk_id: &ChunkId) -> Result<Chunk>;
+    async fn update_state_multi(&mut self, heartbeat_datas: HashMap<String, u64>) -> Result<()>;
 }
