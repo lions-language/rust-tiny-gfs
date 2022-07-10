@@ -176,11 +176,14 @@ impl ChunkHandler {
 
         let chunks_heartbeat_data = hb.write().await.fetch_all();
 
-        storage
+        if let Err(err) = storage
             .write()
             .await
             .update_state_multi(chunks_heartbeat_data)
-            .await;
+            .await
+        {
+            error!("update state multi to storage failed = {}", err);
+        }
     }
 
     fn start_async_tasks(&mut self, heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>) -> Result<()> {

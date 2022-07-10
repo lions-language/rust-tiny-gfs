@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::Storage;
-use crate::{Chunk, ChunkId, Result};
+use crate::{Chunk, ChunkId, Error, Result};
 
 pub struct Memory {}
 
@@ -16,7 +16,7 @@ impl Storage for Memory {
     }
 
     async fn update_state_multi(&mut self, heartbeat_datas: HashMap<String, u64>) -> Result<()> {
-        unimplemented!();
+        Err(Error::Unimplemented("Storage::update_state_multi".into()))
     }
 }
 
