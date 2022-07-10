@@ -10,3 +10,13 @@ impl HeartbeatResponse {
         }
     }
 }
+
+impl RegisterResponse {
+    pub fn new_ok(chunk_id: String) -> Self {
+        Self {
+            chunk_id: chunk_id,
+            code: 0,
+            msg: "success".into(),
+        }
+    }
+}

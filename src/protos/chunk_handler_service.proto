@@ -6,6 +6,9 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
+    string chunk_id = 1;
+    int32 code = 2;
+    string msg = 3;
 }
 
 message HeartbeatRequest {

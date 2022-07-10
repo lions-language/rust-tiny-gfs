@@ -86,12 +86,17 @@ type HeartbeatResponseStream =
 
 pub struct ChunkHandlerServiceImpl {
     heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>,
+    storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
 }
 
 impl ChunkHandlerServiceImpl {
-    fn new(heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>) -> Self {
+    fn new(
+        heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>,
+        storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
+    ) -> Self {
         Self {
             heartbeat_buffer: heartbeat_buffer,
+            storage: storage,
         }
     }
 }
@@ -225,9 +230,11 @@ impl ChunkHandler {
         use tokio::runtime::Runtime;
         let rt = Runtime::new()?;
 
+        let storage = self.storage.clone();
+
         let addr = "[::1]:10000".parse().unwrap();
         let heartbeat_buffer = Arc::new(RwLock::new(HeartbeatBuffer::new()));
-        let mut s = ChunkHandlerServiceImpl::new(heartbeat_buffer.clone());
+        let mut s = ChunkHandlerServiceImpl::new(heartbeat_buffer.clone(), storage);
 
         if let Err(err) = self.start_async_tasks(heartbeat_buffer) {
             error!("chunk handler service start failed");

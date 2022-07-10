@@ -5,6 +5,12 @@ pub struct RegisterRequest {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RegisterResponse {
+    #[prost(string, tag="1")]
+    pub chunk_id: ::prost::alloc::string::String,
+    #[prost(int32, tag="2")]
+    pub code: i32,
+    #[prost(string, tag="3")]
+    pub msg: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
