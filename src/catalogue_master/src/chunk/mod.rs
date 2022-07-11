@@ -87,6 +87,7 @@ type HeartbeatResponseStream =
 pub struct ChunkHandlerServiceImpl {
     heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>,
     storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
+    id_generator: Arc<RwLock<Box<dyn IdGenerator + Sync + Send>>>,
 }
 
 impl ChunkHandlerServiceImpl {
