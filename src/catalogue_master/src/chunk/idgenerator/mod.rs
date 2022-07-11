@@ -1,1 +1,4 @@
-mod mem_disk;
+mod memory;
+
+#[tonic::async_trait]
+trait IdGenerator {}

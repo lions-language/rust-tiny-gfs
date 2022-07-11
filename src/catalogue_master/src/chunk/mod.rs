@@ -109,8 +109,9 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     ) -> std::result::Result<Response<RegisterResponse>, Status> {
         info!("Got a request from {:?}", request.remote_addr());
 
-        let reply = RegisterResponse {};
-        Ok(Response::new(reply))
+        let chunk_id = self.id_generator.generate().await;
+
+        Ok(Response::new(RegisterResponse::new_ok(chunk_id)))
     }
 
     type heartbeatStream =
