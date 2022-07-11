@@ -1,5 +1,6 @@
 mod storage;
 
+pub use id_generator::IdGeneratorMode;
 pub use storage::StorageMode;
 
 use crate::{Error, Result};
@@ -94,11 +95,15 @@ impl ChunkHandlerServiceImpl {
     fn new(
         heartbeat_buffer: Arc<RwLock<HeartbeatBuffer>>,
         storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
-    ) -> Self {
-        Self {
+        id_generator_mod: IdGeneratorMode,
+    ) -> Result<Self> {
+        Ok(Self {
             heartbeat_buffer: heartbeat_buffer,
             storage: storage,
-        }
+            id_generator: Arc::new(RwLock::new(IdGeneratorFactory::new_id_generator(
+                id_generator_mod,
+            )?)),
+        })
     }
 }
 

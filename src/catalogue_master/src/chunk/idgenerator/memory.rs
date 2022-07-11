@@ -17,7 +17,7 @@ impl IdGenerator for Memory {
 }
 
 impl Memory {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self { id: 0 }
     }
 }
