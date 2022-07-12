@@ -1,10 +1,12 @@
+mod idgenerator;
 mod storage;
 
-pub use id_generator::IdGeneratorMode;
+pub use idgenerator::IdGeneratorMode;
+use idgenerator::{IdGenerator, IdGeneratorFactory};
 pub use storage::StorageMode;
+use storage::{Storage, StorageFactory};
 
 use crate::{Error, Result};
-use storage::{Storage, StorageFactory};
 
 use futures::Stream;
 use tokio::sync::{mpsc, RwLock};

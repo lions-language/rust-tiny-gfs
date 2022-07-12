@@ -5,7 +5,7 @@ use memory::Memory;
 use crate::Result;
 
 #[tonic::async_trait]
-trait IdGenerator {
+pub(crate) trait IdGenerator {
     async fn next(&mut self) -> Result<String>;
 }
 
