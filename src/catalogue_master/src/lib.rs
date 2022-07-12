@@ -6,6 +6,7 @@ mod serdeser;
 mod service;
 
 pub use chunk::ChunkHandler;
+pub use chunk::IdGeneratorMode as ChunkIdGeneratorMode;
 pub use chunk::StorageMode as ChunkStorageMode;
 
 pub(crate) use error::{Error, Result};

@@ -117,7 +117,10 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     ) -> std::result::Result<Response<RegisterResponse>, Status> {
         info!("Got a request from {:?}", request.remote_addr());
 
-        let chunk_id = self.id_generator.write().await.next().await?;
+        let chunk_id = match self.id_generator.write().await.next().await {
+            Ok(id) => id,
+            Err(err) => return Err(Status::internal(err.description().to_string())),
+        };
 
         Ok(Response::new(RegisterResponse::new_ok(chunk_id)))
     }
