@@ -8,11 +8,11 @@ pub struct Memory {
 #[tonic::async_trait]
 impl IdGenerator for Memory {
     async fn next(&mut self) -> Result<String> {
-        let r: String = self.id.into();
+        let r: String = self.id.to_string();
 
         self.id += 1;
 
-        r
+        Ok(r)
     }
 }
 

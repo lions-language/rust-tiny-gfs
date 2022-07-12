@@ -117,7 +117,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     ) -> std::result::Result<Response<RegisterResponse>, Status> {
         info!("Got a request from {:?}", request.remote_addr());
 
-        let chunk_id = self.id_generator.generate().await;
+        let chunk_id = self.id_generator.write().await.next().await?;
 
         Ok(Response::new(RegisterResponse::new_ok(chunk_id)))
     }
@@ -235,7 +235,7 @@ impl ChunkHandler {
         Ok(())
     }
 
-    pub fn start(&mut self) -> Result<()> {
+    pub fn start(&mut self, id_generator_mod: IdGeneratorMode) -> Result<()> {
         use tokio::runtime::Runtime;
         let rt = Runtime::new()?;
 
@@ -243,7 +243,8 @@ impl ChunkHandler {
 
         let addr = "[::1]:10000".parse().unwrap();
         let heartbeat_buffer = Arc::new(RwLock::new(HeartbeatBuffer::new()));
-        let mut s = ChunkHandlerServiceImpl::new(heartbeat_buffer.clone(), storage);
+        let mut s =
+            ChunkHandlerServiceImpl::new(heartbeat_buffer.clone(), storage, id_generator_mod)?;
 
         if let Err(err) = self.start_async_tasks(heartbeat_buffer) {
             error!("chunk handler service start failed");
