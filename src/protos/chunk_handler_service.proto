@@ -3,6 +3,7 @@ syntax = "proto3";
 package chunk_handler;
 
 message RegisterRequest {
+    string server_addr = 1;
 }
 
 message RegisterResponse {

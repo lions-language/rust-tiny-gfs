@@ -7,7 +7,7 @@ pub struct Memory {}
 
 #[tonic::async_trait]
 impl Storage for Memory {
-    async fn insert(&mut self, chunk_id: &ChunkId, chunk: Chunk) -> Result<()> {
+    async fn insert(&mut self, chunk_id: ChunkId, chunk: Chunk) -> Result<()> {
         Err(Error::Unimplemented("Storage::insert".into()))
     }
 

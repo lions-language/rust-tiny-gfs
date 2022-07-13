@@ -122,11 +122,13 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
             Err(err) => return Err(Status::internal(err.description().to_string())),
         };
 
+        let register_request = request.into_inner();
+
         if let Err(err) = self
             .storage
             .write()
             .await
-            .insert(chunk_id.into(), Chunk::new(request.server_addr))
+            .insert(chunk_id.into(), Chunk::new(register_request.server_addr))
             .await
         {
             return Err(Status::internal(err.description().to_string()));

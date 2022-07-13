@@ -21,7 +21,7 @@ impl StorageFactory {
 
 #[tonic::async_trait]
 pub(crate) trait Storage {
-    async fn insert(&mut self, chunk_id: &ChunkId, chunk: Chunk) -> Result<()>;
+    async fn insert(&mut self, chunk_id: ChunkId, chunk: Chunk) -> Result<()>;
     fn find(&self, chunk_id: &ChunkId) -> Result<Chunk>;
     async fn update_state_multi(&mut self, heartbeat_datas: HashMap<String, u64>) -> Result<()>;
 }

@@ -24,6 +24,14 @@ pub(crate) struct Chunk {
     chunk_server: ChunkServer,
 }
 
+impl Chunk {
+    pub(crate) fn new(chunk_server: ChunkServer) -> Self {
+        Self {
+            chunk_server: chunk_server,
+        }
+    }
+}
+
 pub(crate) struct ChunkId(String);
 
 impl From<String> for ChunkId {
