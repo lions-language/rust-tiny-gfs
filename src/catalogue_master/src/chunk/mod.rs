@@ -6,7 +6,7 @@ use idgenerator::{IdGenerator, IdGeneratorFactory};
 pub use storage::StorageMode;
 use storage::{Storage, StorageFactory};
 
-use crate::{Error, Result};
+use crate::{Chunk, Error, Result};
 
 use futures::Stream;
 use tokio::sync::{mpsc, RwLock};
@@ -124,6 +124,8 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 
         if let Err(err) = self
             .storage
+            .write()
+            .await
             .insert(chunk_id.into(), Chunk::new(request.server_addr))
             .await
         {
