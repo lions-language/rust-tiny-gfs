@@ -3,8 +3,9 @@ mod storage;
 
 pub use idgenerator::IdGeneratorMode;
 use idgenerator::{IdGenerator, IdGeneratorFactory};
+use storage::Storage;
+pub(crate) use storage::StorageFactory;
 pub use storage::StorageMode;
-use storage::{Storage, StorageFactory};
 
 use crate::{Chunk, Error, Result};
 
@@ -313,7 +314,7 @@ impl ChunkHandler {
         Ok(())
     }
 
-    pub fn new(storage: ArcStorage) -> Result<Self> {
+    pub(crate) fn new(storage: ArcStorage) -> Result<Self> {
         Ok(Self { storage: storage })
     }
 }

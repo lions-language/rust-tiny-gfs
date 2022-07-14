@@ -3,13 +3,16 @@ mod error;
 mod iowrap;
 mod proto;
 mod serdeser;
+mod server;
 mod service;
 
 pub use chunk::ChunkHandler;
 pub use chunk::IdGeneratorMode as ChunkIdGeneratorMode;
 pub use chunk::StorageMode as ChunkStorageMode;
+pub use server::Server;
 
-pub(crate) use error::{Error, Result};
+pub(crate) use chunk::StorageFactory as ChunkStorageFactory;
+pub use error::{Error, Result};
 
 struct NSNode {
     name: String,

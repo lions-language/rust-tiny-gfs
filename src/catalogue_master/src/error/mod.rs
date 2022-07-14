@@ -1,4 +1,4 @@
-pub(crate) type Result<T> = anyhow::Result<T, Error>;
+pub type Result<T> = anyhow::Result<T, Error>;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
