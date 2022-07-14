@@ -51,3 +51,9 @@ pub struct File {
 }
 
 struct ChunkServer(String);
+
+impl From<String> for ChunkServer {
+    fn from(v: String) -> Self {
+        Self(v)
+    }
+}

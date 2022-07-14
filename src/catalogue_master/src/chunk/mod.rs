@@ -128,7 +128,10 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
             .storage
             .write()
             .await
-            .insert(chunk_id.into(), Chunk::new(register_request.server_addr))
+            .insert(
+                chunk_id.clone().into(),
+                Chunk::new(register_request.server_addr.into()),
+            )
             .await
         {
             return Err(Status::internal(err.description().to_string()));
