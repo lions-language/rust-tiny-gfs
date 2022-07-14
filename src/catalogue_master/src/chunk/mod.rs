@@ -195,6 +195,8 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     }
 }
 
+type ArcStorage = Arc<RwLock<Box<dyn Storage + Sync + Send>>>;
+
 pub struct ChunkHandler {
     storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
 }
@@ -311,9 +313,7 @@ impl ChunkHandler {
         Ok(())
     }
 
-    pub fn new(storage_mode: StorageMode) -> Result<Self> {
-        Ok(Self {
-            storage: Arc::new(RwLock::new(StorageFactory::new_storage(storage_mode)?)),
-        })
+    pub fn new(storage: ArcStorage) -> Result<Self> {
+        Ok(Self { storage: storage })
     }
 }
