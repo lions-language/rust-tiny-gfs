@@ -51,6 +51,8 @@ fn match_for_io_error(err_status: &Status) -> Option<&std::io::Error> {
     }
 }
 
+type ArcStorage = Arc<RwLock<Box<dyn Storage + Sync + Send>>>;
+
 struct HeartbeatBuffer {
     chunk_ids: HashMap<String, u64>,
 }
@@ -82,6 +84,16 @@ impl HeartbeatBuffer {
         Self {
             chunk_ids: HashMap::new(),
         }
+    }
+}
+
+pub(crate) struct ChunkOperator {
+    storage: ArcStorage,
+}
+
+impl ChunkOperator {
+    fn new(storage: ArcStorage) -> Self {
+        Self { storage: storage }
     }
 }
 
@@ -196,9 +208,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
     }
 }
 
-type ArcStorage = Arc<RwLock<Box<dyn Storage + Sync + Send>>>;
-
-pub struct ChunkHandler {
+pub(crate) struct ChunkHandler {
     storage: Arc<RwLock<Box<dyn Storage + Sync + Send>>>,
 }
 
@@ -256,7 +266,7 @@ impl ChunkHandler {
         Ok(())
     }
 
-    pub fn start(&mut self, id_generator_mod: IdGeneratorMode) -> Result<()> {
+    pub(crate) fn start(&mut self, id_generator_mod: IdGeneratorMode) -> Result<()> {
         use tokio::runtime::Runtime;
         let rt = Runtime::new()?;
 
