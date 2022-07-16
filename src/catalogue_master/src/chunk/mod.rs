@@ -1,8 +1,10 @@
 mod idgenerator;
+mod operator;
 mod storage;
 
 pub use idgenerator::IdGeneratorMode;
 use idgenerator::{IdGenerator, IdGeneratorFactory};
+pub(crate) use operator::ChunkOperator;
 use storage::Storage;
 pub(crate) use storage::StorageFactory;
 pub use storage::StorageMode;
@@ -84,16 +86,6 @@ impl HeartbeatBuffer {
         Self {
             chunk_ids: HashMap::new(),
         }
-    }
-}
-
-pub(crate) struct ChunkOperator {
-    storage: ArcStorage,
-}
-
-impl ChunkOperator {
-    fn new(storage: ArcStorage) -> Self {
-        Self { storage: storage }
     }
 }
 

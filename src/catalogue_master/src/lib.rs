@@ -6,8 +6,6 @@ mod serdeser;
 mod server;
 mod service;
 
-pub(crate) use chunk::ChunkHandler;
-pub use chunk::IdGeneratorMode as ChunkIdGeneratorMode;
 pub use chunk::StorageMode as ChunkStorageMode;
 pub use server::Server;
 

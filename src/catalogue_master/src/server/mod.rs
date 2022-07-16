@@ -2,20 +2,22 @@ use std::sync::Arc;
 
 use tokio::sync::RwLock;
 
-use crate::{ChunkIdGeneratorMode, ChunkStorageFactory, ChunkStorageMode, Result};
+use crate::Result;
 
-use crate::chunk::ChunkHandler;
+use crate::chunk::{ChunkHandler, ChunkOperator, IdGeneratorMode, StorageFactory, StorageMode};
 
 pub struct Server {}
 
 impl Server {
-    pub fn start(&self, chunk_storage_mode: ChunkStorageMode) -> Result<()> {
-        let chunk_storage = Arc::new(RwLock::new(ChunkStorageFactory::new_storage(
+    pub fn start(&self, chunk_storage_mode: StorageMode) -> Result<()> {
+        let chunk_storage = Arc::new(RwLock::new(StorageFactory::new_storage(
             chunk_storage_mode,
         )?));
 
-        let mut chunk_handler = ChunkHandler::new(chunk_storage)?;
-        chunk_handler.start(ChunkIdGeneratorMode::Memory)?;
+        let mut chunk_handler = ChunkHandler::new(chunk_storage.clone())?;
+        chunk_handler.start(IdGeneratorMode::Memory)?;
+
+        let mut chunk_operator = ChunkOperator::new(chunk_storage);
 
         Ok(())
     }
