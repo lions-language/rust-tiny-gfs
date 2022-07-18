@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package catalogue;
+
+message CreateFileRequest {
+    string name = 1;
+}
+
+message CreateFileResponse {
+}
+
+message DeleteFileRequest {
+}
+
+message DeleteFileResponse {
+}
+
+message GetFileRequest {
+}
+
+message GetFileResponse {
+}
+
+service CatalogueService {
+    rpc create_file(CreateFileRequest) returns (CreateFileResponse) {}
+    rpc delete_file(DeleteFileRequest) returns (DeleteFileResponse) {}
+    rpc get_file(GetFileRequest) returns (GetFileResponse) {}
+}
