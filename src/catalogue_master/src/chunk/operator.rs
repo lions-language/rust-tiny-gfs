@@ -1,5 +1,5 @@
 use super::ArcStorage;
-use crate::ChunkId;
+use crate::{Chunk, ChunkId};
 
 pub(crate) struct ChunkOperator {
     storage: ArcStorage,
@@ -10,7 +10,11 @@ pub(crate) struct ApplyChunkData {
 }
 
 impl ChunkOperator {
-    pub(crate) fn apply_chunks(&mut self, data: ApplyChunkData) -> Vec<ChunkId> {
+    pub(crate) async fn apply_chunks(&mut self, data: ApplyChunkData) -> Vec<ChunkId> {
+        unimplemented!();
+    }
+
+    pub(crate) async fn find_chunk(&self, chunk_id: &ChunkId) -> Option<Chunk> {
         unimplemented!();
     }
 
