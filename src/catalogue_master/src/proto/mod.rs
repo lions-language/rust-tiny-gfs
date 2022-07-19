@@ -1,5 +1,7 @@
+pub(crate) mod catalogue;
 pub mod chunk_handler;
 
+pub(crate) use catalogue::*;
 pub use chunk_handler::*;
 
 impl HeartbeatResponse {

@@ -16,7 +16,7 @@ use crate::proto::catalogue::{catalogue_service_server::*, *};
 
 pub(crate) struct CatalogueServiceImpl {}
 
-impl ChunkHandlerServiceImpl {
+impl CatalogueServiceImpl {
     pub(crate) fn new() -> Result<Self> {
         Ok(Self {})
     }
@@ -30,7 +30,8 @@ impl CatalogueService for CatalogueServiceImpl {
     ) -> std::result::Result<Response<CreateFileResponse>, Status> {
         info!("Got a request from {:?}", request.remote_addr());
 
-        Ok(Response::new(CreateFileResponse::new_ok(chunk_id)))
+        // Ok(Response::new(CreateFileResponse::new_ok(chunk_id)))
+        unimplemented!();
     }
 
     async fn delete_file(
