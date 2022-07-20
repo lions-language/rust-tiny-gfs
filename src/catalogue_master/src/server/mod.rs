@@ -1,3 +1,4 @@
+mod allocer;
 mod service;
 
 use std::sync::Arc;
@@ -7,6 +8,8 @@ use tokio::sync::RwLock;
 use crate::Result;
 
 use crate::chunk::{ChunkHandler, ChunkOperator, IdGeneratorMode, StorageFactory, StorageMode};
+
+use allocer::Allocer;
 
 pub struct Server {}
 
@@ -20,6 +23,8 @@ impl Server {
         chunk_handler.start(IdGeneratorMode::Memory)?;
 
         let mut chunk_operator = ChunkOperator::new(chunk_storage);
+
+        let allocer = Allocer::new();
 
         Ok(())
     }

@@ -30,6 +30,8 @@ impl CatalogueService for CatalogueServiceImpl {
     ) -> std::result::Result<Response<CreateFileResponse>, Status> {
         info!("Got a request from {:?}", request.remote_addr());
 
+        // 1. get chunks via file name
+
         // Ok(Response::new(CreateFileResponse::new_ok(chunk_id)))
         unimplemented!();
     }
