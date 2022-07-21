@@ -1,13 +1,9 @@
-pub mod pb {
-    tonic::include_proto!("grpc.examples.echo");
-}
+use catalogue_master::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 use futures::stream::Stream;
 use std::time::Duration;
 use tokio_stream::StreamExt;
 use tonic::transport::Channel;
-
-use pb::{echo_client::EchoClient, EchoRequest};
 
 fn echo_requests_iter() -> impl Stream<Item = EchoRequest> {
     tokio_stream::iter(1..usize::MAX).map(|i| EchoRequest {
