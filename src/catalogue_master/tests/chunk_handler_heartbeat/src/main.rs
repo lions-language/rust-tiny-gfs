@@ -5,14 +5,16 @@ use std::time::Duration;
 use tokio_stream::StreamExt;
 use tonic::transport::Channel;
 
+fn heartbeat_requests_iter() -> impl Stream<Item = HeartbeatRequest> {
+    tokio_stream::iter(1..usize::MAX).map(|i| HeartbeatRequest {
+        chunk_id: "xxx".into(),
+    })
+}
+
 async fn streaming_heartbeat(client: &mut ChunkHandlerServiceClient<Channel>, num: usize) {
-    let stream = client
-        .heartbeat(HeartbeatRequest {
-            chunk_id: "xxx".into(),
-        })
-        .await
-        .unwrap()
-        .into_inner();
+    let in_stream = heartbeat_requests_iter().throttle(Duration::from_secs(1));
+
+    let stream = client.heartbeat(in_stream).await.unwrap().into_inner();
 
     // stream is infinite - take just 5 elements and then disconnect
     let mut stream = stream.take(num);
