@@ -78,7 +78,10 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
 
         let chunk_id = match self.id_generator.write().await.next().await {
             Ok(id) => id,
-            Err(err) => return Err(Status::internal(err.description().to_string())),
+            Err(err) => {
+                error!("{}", err);
+                return Err(Status::internal(err.description().to_string()));
+            }
         };
 
         let register_request = request.into_inner();
@@ -93,6 +96,7 @@ impl ChunkHandlerService for ChunkHandlerServiceImpl {
             )
             .await
         {
+            error!("insert failed = {}", err);
             return Err(Status::internal(err.description().to_string()));
         };
 
