@@ -23,7 +23,7 @@ impl Stream for HeartbeatStream {
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        (std::usize::MAX, None)
+        (1, None)
     }
 }
 
@@ -33,17 +33,17 @@ impl Stream for HeartbeatStream {
 //     })
 // }
 
-async fn streaming_heartbeat(client: &mut ChunkHandlerServiceClient<Channel>, num: usize) {
+async fn streaming_heartbeat(client: &mut ChunkHandlerServiceClient<Channel>) {
     // let interval = tokio::time::interval(Duration::from_millis(10));
     // let in_stream = IntervalStream::new(interval);
     // let in_stream = heartbeat_requests_iter().throttle(Duration::from_secs(1));
 
-    let in_stream = HeartbeatStream::new();
+    let in_stream = HeartbeatStream::new().throttle(Duration::from_secs(1));
 
-    let stream = client.heartbeat(in_stream).await.unwrap().into_inner();
+    let mut stream = client.heartbeat(in_stream).await.unwrap().into_inner();
 
     // stream is infinite - take just 5 elements and then disconnect
-    let mut stream = stream.take(num);
+    // let mut stream = stream.take(num);
     while let Some(item) = stream.next().await {
         println!("\treceived: {}", item.unwrap().msg);
     }
@@ -52,12 +52,12 @@ async fn streaming_heartbeat(client: &mut ChunkHandlerServiceClient<Channel>, nu
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = ChunkHandlerServiceClient::connect("http://[::1]:50051")
+    let mut client = ChunkHandlerServiceClient::connect("http://[::1]:10000")
         .await
         .unwrap();
 
-    println!("Streaming heartbeat:");
-    streaming_heartbeat(&mut client, 5).await;
+    // println!("Streaming heartbeat:");
+    streaming_heartbeat(&mut client).await;
 
     Ok(())
 }
