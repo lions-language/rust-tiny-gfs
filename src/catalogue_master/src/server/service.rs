@@ -28,7 +28,7 @@ impl CatalogueService for CatalogueServiceImpl {
         &self,
         request: Request<CreateFileRequest>,
     ) -> std::result::Result<Response<CreateFileResponse>, Status> {
-        info!("Got a request from {:?}", request.remote_addr());
+        info!("create file: got a request from {:?}", request.remote_addr());
 
         // 1. get chunks via file name
 
