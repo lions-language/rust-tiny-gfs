@@ -34,6 +34,8 @@ impl Chunk {
     }
 }
 
+type Chunks = Vec<Chunk>;
+
 pub(crate) struct ChunkId(String);
 
 impl From<String> for ChunkId {

@@ -2,6 +2,8 @@
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateFileRequest {
     #[prost(string, tag="1")]
+    pub dir: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
     pub name: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
