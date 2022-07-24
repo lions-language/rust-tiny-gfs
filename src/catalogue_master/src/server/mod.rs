@@ -1,4 +1,6 @@
 mod allocer;
+mod filemgr;
+mod metadata;
 mod service;
 
 use std::sync::Arc;

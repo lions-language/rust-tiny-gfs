@@ -3,7 +3,8 @@ syntax = "proto3";
 package catalogue;
 
 message CreateFileRequest {
-    string name = 1;
+    string dir = 1;
+    string name = 2;
 }
 
 message CreateFileResponse {
