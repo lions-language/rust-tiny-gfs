@@ -1,4 +1,4 @@
-use crate::{Chunks, Result};
+use crate::{Chunks, File, Result};
 
 use super::Metadata;
 
@@ -6,7 +6,7 @@ pub(crate) struct Memory {}
 
 #[tonic::async_trait]
 impl Metadata for Memory {
-    async fn get_file(&self, dir: String, name: String) -> Result<Option<Chunks>> {
+    async fn get_file(&self, dir: String, name: String) -> Result<Option<File>> {
         unimplemented!();
     }
 }
