@@ -2,6 +2,6 @@ mod storage;
 
 use crate::*;
 
-pub trait Service {
+pub(crate) trait Service {
     fn find(path: &Path) -> Result<File>;
 }

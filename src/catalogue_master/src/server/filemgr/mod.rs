@@ -25,8 +25,8 @@ impl FileMgr {
             .get_file(req.dir.into(), req.name.into())
             .await
         {
-            Ok(chunks) => match chunks {
-                Some(chunks) => {
+            Ok(file) => match file {
+                Some(file) => {
                     // check
                     unimplemented!();
                 }

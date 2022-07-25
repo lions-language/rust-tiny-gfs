@@ -1,5 +1,6 @@
 mod chunk;
 mod error;
+mod filesys;
 mod iowrap;
 mod serdeser;
 mod server;
@@ -12,15 +13,6 @@ pub use server::Server;
 
 pub(crate) use chunk::StorageFactory as ChunkStorageFactory;
 pub use error::{Error, Result};
-
-struct NSNode {
-    name: String,
-}
-
-pub struct Path {
-    namespace: Vec<NSNode>,
-    name: String,
-}
 
 pub(crate) struct Chunk {
     chunk_server: ChunkServer,
@@ -44,16 +36,6 @@ impl From<String> for ChunkId {
     }
 }
 
-struct FileObject {
-    chunk_id: ChunkId,
-    pos: usize,
-    length: usize,
-}
-
-pub struct File {
-    objects: Vec<FileObject>,
-}
-
 struct ChunkServer(String);
 
 impl From<String> for ChunkServer {
@@ -61,3 +43,5 @@ impl From<String> for ChunkServer {
         Self(v)
     }
 }
+
+pub(crate) use filesys::{File, FileObject, NSNode, Path};
