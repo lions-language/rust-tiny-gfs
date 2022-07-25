@@ -1,3 +1,5 @@
+mod memory;
+
 use crate::Chunks;
 
 use crate::Result;
@@ -9,3 +11,21 @@ pub(crate) trait Metadata {
 
 pub(crate) type MetadataPtr = Box<dyn Metadata + Sync + Send>;
 pub(crate) type MetadataPtrArc = std::sync::Arc<tokio::sync::RwLock<MetadataPtr>>;
+
+pub(crate) enum MetadataMode {
+    Memory,
+}
+
+pub(crate) struct MetadataFactory {}
+
+impl MetadataFactory {
+    pub(crate) fn create_metadata(&self, mode: MetadataMode) -> Result<MetadataPtr> {
+        match mode {
+            MetadataMode::Memory => Ok(Box::new(memory::Memory::new())),
+        }
+    }
+
+    pub(crate) fn new() -> Self {
+        Self {}
+    }
+}
