@@ -44,4 +44,4 @@ impl From<String> for ChunkServer {
     }
 }
 
-pub(crate) use filesys::{File, FileObject, NSNode, Path};
+pub(crate) use filesys::{File, FileObject, Path};

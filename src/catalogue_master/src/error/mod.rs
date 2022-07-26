@@ -6,6 +6,8 @@ pub enum Error {
     IoError(#[from] std::io::Error),
     #[error("innner error = {0}")]
     InnerError(String),
+    #[error("{0} already exist")]
+    AlreadyExist(String),
     #[error("{0} unimplemented")]
     Unimplemented(String),
 }

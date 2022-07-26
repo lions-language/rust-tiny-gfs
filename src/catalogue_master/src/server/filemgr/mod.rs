@@ -2,7 +2,7 @@ use crate::server::metadata::{Metadata, MetadataPtr, MetadataPtrArc};
 
 use crate::proto::catalogue::CreateFileRequest;
 
-use crate::Result;
+use crate::{Error, Result};
 
 pub(crate) struct FileMgr {
     metadata: MetadataPtrArc,
@@ -28,7 +28,10 @@ impl FileMgr {
             Ok(file) => match file {
                 Some(file) => {
                     // check
-                    unimplemented!();
+                    if file.is_finish() {
+                        return Err(Error::AlreadyExist(req.name.into()));
+                    } else {
+                    }
                 }
                 None => {
                     // alloc
