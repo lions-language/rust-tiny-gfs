@@ -6,6 +6,8 @@ mod serdeser;
 mod server;
 mod service;
 
+pub(crate) mod utils;
+
 pub mod proto;
 
 pub use chunk::StorageMode as ChunkStorageMode;

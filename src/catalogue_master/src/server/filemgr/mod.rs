@@ -29,7 +29,7 @@ impl FileMgr {
                 Some(file) => {
                     // check
                     if file.is_finish() {
-                        return Err(Error::AlreadyExist(req.name.into()));
+                        return Err(Error::AlreadyExist(file.full_name()));
                     } else {
                     }
                 }
