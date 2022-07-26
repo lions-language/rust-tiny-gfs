@@ -9,6 +9,10 @@ impl Metadata for Memory {
     async fn get_file(&self, dir: String, name: String) -> Result<Option<File>> {
         unimplemented!();
     }
+
+    async fn alloc(&mut self) -> Result<File> {
+        unimplemented!();
+    }
 }
 
 impl Memory {

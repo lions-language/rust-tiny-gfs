@@ -2,6 +2,7 @@ use crate::server::metadata::{Metadata, MetadataPtr, MetadataPtrArc};
 
 use crate::proto::catalogue::CreateFileRequest;
 
+use crate::filesys::File;
 use crate::{Error, Result};
 
 pub(crate) struct FileMgr {
@@ -9,7 +10,7 @@ pub(crate) struct FileMgr {
 }
 
 impl FileMgr {
-    pub(crate) async fn create_file(&mut self, req: CreateFileRequest) -> Result<()> {
+    pub(crate) async fn create_file(&mut self, req: CreateFileRequest) -> Result<File> {
         // 1. file is exists (read from metadata)
         // - exist:
         //  - read finish marker
@@ -31,6 +32,7 @@ impl FileMgr {
                     if file.is_finish() {
                         return Err(Error::AlreadyExist(file.full_name()));
                     } else {
+                        Ok(file)
                     }
                 }
                 None => {
