@@ -10,7 +10,7 @@ use crate::{Chunks, File};
 #[tonic::async_trait]
 pub(crate) trait Metadata {
     async fn get_file(&self, dir: String, name: String) -> Result<Option<File>>;
-    async fn alloc(&mut self) -> Result<File>;
+    async fn alloc(&mut self, total: i64) -> Result<File>;
 }
 
 pub(crate) type MetadataPtr = Box<dyn Metadata + Sync + Send>;

@@ -10,7 +10,7 @@ impl Metadata for Memory {
         unimplemented!();
     }
 
-    async fn alloc(&mut self) -> Result<File> {
+    async fn alloc(&mut self, total: i64) -> Result<File> {
         unimplemented!();
     }
 }

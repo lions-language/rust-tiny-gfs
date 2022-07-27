@@ -5,6 +5,8 @@ pub struct CreateFileRequest {
     pub dir: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
     pub name: ::prost::alloc::string::String,
+    #[prost(int64, tag="3")]
+    pub total: i64,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]

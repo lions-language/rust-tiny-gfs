@@ -5,6 +5,7 @@ package catalogue;
 message CreateFileRequest {
     string dir = 1;
     string name = 2;
+    int64 total = 3;
 }
 
 message CreateFileResponse {

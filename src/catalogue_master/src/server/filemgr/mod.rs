@@ -37,7 +37,7 @@ impl FileMgr {
                 }
                 None => {
                     // alloc
-                    unimplemented!();
+                    self.metadata.write().await.alloc(req.total).await
                 }
             },
             Err(err) => Err(err),
