@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "utils",
     "chunk_server",
     "catalogue_master",
     "catalogue_master/tests/chunk_handler_heartbeat",

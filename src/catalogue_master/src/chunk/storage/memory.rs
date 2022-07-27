@@ -12,7 +12,7 @@ impl Storage for Memory {
     }
 
     fn find(&self, chunk_id: &ChunkId) -> Result<Chunk> {
-        unimplemented!();
+        Err(Error::Unimplemented("Storage::find".into()))
     }
 
     async fn update_state_multi(&mut self, heartbeat_datas: HashMap<String, u64>) -> Result<()> {
