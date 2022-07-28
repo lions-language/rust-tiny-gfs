@@ -1,3 +1,3 @@
 mod logs;
 
-pub use logs::init_file_log;
+pub use logs::init_simple_file_log;

@@ -25,3 +25,5 @@ log = "0.4"
 
 [build-dependencies]
 tonic-build = { version = "0.7", features = ["prost"] }
+
+utils = { path = "../utils" }
