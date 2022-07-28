@@ -148,35 +148,6 @@ impl ChunkHandler {
             level: log::LevelFilter::Info,
         });
 
-        // // log
-        // let chunk_handler_log = log4rs::append::file::FileAppender::builder()
-        //     .encoder(Box::new(log4rs::encode::pattern::PatternEncoder::new(
-        //         "{d} - {m}{n}",
-        //     )))
-        //     .build("logs/chunk_handler.log")
-        //     .unwrap();
-
-        // let chunk_handler_log_name = "chunk_handler_log";
-        // let config = log4rs::config::Config::builder()
-        //     .appender(
-        //         log4rs::config::Appender::builder()
-        //             .build(chunk_handler_log_name, Box::new(chunk_handler_log)),
-        //     )
-        //     .logger(
-        //         log4rs::config::Logger::builder()
-        //             .appender(chunk_handler_log_name)
-        //             .additive(false)
-        //             .build("app::chunk_handler_log", log::LevelFilter::Info),
-        //     )
-        //     .build(
-        //         log4rs::config::Root::builder()
-        //             .appender(chunk_handler_log_name)
-        //             .build(log::LevelFilter::Info),
-        //     )
-        //     .unwrap();
-
-        // log4rs::init_config(config).unwrap();
-
         info!("chunk handler start success");
 
         rt.block_on(async {

@@ -5,13 +5,17 @@ mod service;
 
 use std::sync::Arc;
 
+use log::info;
 use tokio::sync::RwLock;
 
-use crate::Result;
+use tiny_gfs_utils::{init_simple_file_log, SimpleFileLog};
 
 use crate::chunk::{ChunkHandler, ChunkOperator, IdGeneratorMode, StorageFactory, StorageMode};
+use crate::proto::catalogue_service_server::CatalogueServiceServer;
+use crate::Result;
 
 use allocer::Allocer;
+use service::CatalogueServiceImpl;
 
 pub struct Server {}
 
@@ -27,6 +31,33 @@ impl Server {
         let mut chunk_operator = ChunkOperator::new(chunk_storage);
 
         let allocer = Allocer::new();
+
+        Ok(())
+    }
+
+    fn start_service(&mut self, id_generator_mod: IdGeneratorMode) -> Result<()> {
+        use tokio::runtime::Runtime;
+        let rt = Runtime::new()?;
+
+        let addr = "[::1]:10010".parse().unwrap();
+        let mut s = CatalogueServiceImpl::new()?;
+
+        init_simple_file_log(tiny_gfs_utils::SimpleFileLog {
+            name: "catalogue_master_service_log",
+            app_name: "app::catalogue_master_service_log",
+            path: "logs/catalogue_master_service.log",
+            level: log::LevelFilter::Info,
+        });
+
+        info!("catalogue master service start success");
+
+        rt.block_on(async {
+            tonic::transport::Server::builder()
+                .add_service(CatalogueServiceServer::new(s))
+                .serve(addr)
+                .await
+                .unwrap();
+        });
 
         Ok(())
     }
