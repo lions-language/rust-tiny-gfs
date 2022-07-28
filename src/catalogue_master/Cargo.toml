@@ -23,7 +23,7 @@ tonic = { version = "0.7", features = ["default"] }
 log4rs = "1.1"
 log = "0.4"
 
+tiny_gfs_utils = { path = "../utils" }
+
 [build-dependencies]
 tonic-build = { version = "0.7", features = ["prost"] }
-
-utils = { path = "../utils" }

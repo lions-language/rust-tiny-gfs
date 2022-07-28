@@ -1,15 +1,15 @@
 pub struct SimpleFileLog<'a> {
-    name: &'a str,
-    app_name: &'a str,
-    path: &'a str,
-    level: log::LevelFilter,
+    pub name: &'a str,
+    pub app_name: &'a str,
+    pub path: &'a str,
+    pub level: log::LevelFilter,
 }
 
 pub fn init_simple_file_log<'a>(info: SimpleFileLog<'a>) {
     // log
     let log = log4rs::append::file::FileAppender::builder()
         .encoder(Box::new(log4rs::encode::pattern::PatternEncoder::new(
-            "{h} {d} {l} {f}:{L} - {m}{n}",
+            "{d} {l} {f}:{L} - {m}{n}",
         )))
         .build(info.path)
         .unwrap();
