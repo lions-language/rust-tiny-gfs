@@ -15,12 +15,19 @@ use crate::proto::catalogue_service_server::CatalogueServiceServer;
 use crate::Result;
 
 use allocer::Allocer;
+use metadata::MetadataFactory;
 use service::CatalogueServiceImpl;
+
+pub use metadata::MetadataMode;
 
 pub struct Server {}
 
 impl Server {
-    pub fn start(&self, chunk_storage_mode: StorageMode) -> Result<()> {
+    pub fn start(
+        &mut self,
+        chunk_storage_mode: StorageMode,
+        metadata_mode: MetadataMode,
+    ) -> Result<()> {
         let chunk_storage = Arc::new(RwLock::new(StorageFactory::new_storage(
             chunk_storage_mode,
         )?));
@@ -28,14 +35,16 @@ impl Server {
         let mut chunk_handler = ChunkHandler::new(chunk_storage.clone())?;
         chunk_handler.start(IdGeneratorMode::Memory)?;
 
-        let mut chunk_operator = ChunkOperator::new(chunk_storage);
+        self.start_service(metadata_mode)?;
 
-        let allocer = Allocer::new();
+        // let mut chunk_operator = ChunkOperator::new(chunk_storage);
+
+        // let allocer = Allocer::new();
 
         Ok(())
     }
 
-    fn start_service(&mut self, id_generator_mod: IdGeneratorMode) -> Result<()> {
+    fn start_service(&mut self, metadata_mode: MetadataMode) -> Result<()> {
         use tokio::runtime::Runtime;
         let rt = Runtime::new()?;
 

@@ -16,7 +16,7 @@ pub(crate) trait Metadata {
 pub(crate) type MetadataPtr = Box<dyn Metadata + Sync + Send>;
 pub(crate) type MetadataPtrArc = std::sync::Arc<tokio::sync::RwLock<MetadataPtr>>;
 
-pub(crate) enum MetadataMode {
+pub enum MetadataMode {
     Memory,
 }
 

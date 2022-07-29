@@ -11,6 +11,7 @@ pub(crate) mod utils;
 pub mod proto;
 
 pub use chunk::StorageMode as ChunkStorageMode;
+pub use server::MetadataMode as ServerMetadataMode;
 pub use server::Server;
 
 pub(crate) use chunk::StorageFactory as ChunkStorageFactory;
