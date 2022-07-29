@@ -1,3 +1,5 @@
+use tokio::sync::RwLock;
+
 use crate::server::metadata::{Metadata, MetadataPtr, MetadataPtrArc};
 
 use crate::proto::catalogue::CreateFileRequest;
@@ -48,3 +50,5 @@ impl FileMgr {
         Self { metadata }
     }
 }
+
+pub(crate) type FileMgrArc = std::sync::Arc<tokio::sync::RwLock<FileMgr>>;

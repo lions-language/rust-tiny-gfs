@@ -49,7 +49,7 @@ impl Server {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10010".parse().unwrap();
-        let mut s = CatalogueServiceImpl::new()?;
+        let mut s = CatalogueServiceImpl::new(metadata_mode)?;
 
         init_simple_file_log(tiny_gfs_utils::SimpleFileLog {
             name: "catalogue_master_service_log",

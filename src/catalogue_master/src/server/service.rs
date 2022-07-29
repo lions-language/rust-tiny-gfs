@@ -6,6 +6,7 @@ use tokio::time::{self, Duration, Interval};
 use tonic::{transport::Server, Request, Response, Status, Streaming};
 
 use std::collections::HashMap;
+use std::fs::File;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::{error::Error as StdError, io::ErrorKind};
@@ -14,11 +15,17 @@ use log::{error, info, warn};
 
 use crate::proto::catalogue::{catalogue_service_server::*, *};
 
-pub(crate) struct CatalogueServiceImpl {}
+use super::filemgr::{new_shared_file_mgr, FileMgr, FileMgrArc};
+
+pub(crate) struct CatalogueServiceImpl {
+    file_mgr: FileMgrArc,
+}
 
 impl CatalogueServiceImpl {
-    pub(crate) fn new() -> Result<Self> {
-        Ok(Self {})
+    pub(crate) fn new(metadata_mode: MetadataMode) -> Result<Self> {
+        Ok(Self {
+            file_mgr: new_shared_file_mgr(metadata_mode)?,
+        })
     }
 }
 
@@ -28,7 +35,10 @@ impl CatalogueService for CatalogueServiceImpl {
         &self,
         request: Request<CreateFileRequest>,
     ) -> std::result::Result<Response<CreateFileResponse>, Status> {
-        info!("create file: got a request from {:?}", request.remote_addr());
+        info!(
+            "create file: got a request from {:?}",
+            request.remote_addr()
+        );
 
         // 1. get chunks via file name
 
