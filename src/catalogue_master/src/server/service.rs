@@ -16,6 +16,7 @@ use log::{error, info, warn};
 use crate::proto::catalogue::{catalogue_service_server::*, *};
 
 use super::filemgr::{new_shared_file_mgr, FileMgr, FileMgrArc};
+use super::metadata::MetadataMode;
 
 pub(crate) struct CatalogueServiceImpl {
     file_mgr: FileMgrArc,

@@ -1,11 +1,14 @@
 use tokio::sync::RwLock;
+use tonic::metadata;
 
-use crate::server::metadata::{Metadata, MetadataPtr, MetadataPtrArc};
+use crate::server::metadata::{Metadata, MetadataMode, MetadataPtr, MetadataPtrArc};
 
 use crate::proto::catalogue::CreateFileRequest;
 
 use crate::filesys::File;
 use crate::{Error, Result};
+
+use super::metadata::MetadataFactory;
 
 pub(crate) struct FileMgr {
     metadata: MetadataPtrArc,
@@ -52,3 +55,9 @@ impl FileMgr {
 }
 
 pub(crate) type FileMgrArc = std::sync::Arc<tokio::sync::RwLock<FileMgr>>;
+
+pub(crate) fn new_shared_file_mgr(metadata_mode: MetadataMode) -> Result<FileMgrArc> {
+    Ok(std::sync::Arc::new(tokio::sync::RwLock::new(FileMgr::new(
+        MetadataFactory::new().create_metadata_arc(metadata_mode)?,
+    ))))
+}
