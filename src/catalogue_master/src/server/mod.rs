@@ -52,6 +52,9 @@ impl Server {
         let addr = "[::1]:10010".parse().unwrap();
         let s = CatalogueServiceImpl::new(metadata_mode)?;
 
+        let _guards =
+            common_tracing::init_global_tracing("metactl", "./_metactl_log", &config.log_level);
+
         init_simple_file_log(tiny_gfs_utils::SimpleFileLog {
             name: "catalogue_master_service_log",
             app_name: "app::catalogue_master_service_log",

@@ -24,6 +24,7 @@ log4rs = "1.1"
 log = "0.4"
 
 tiny_gfs_utils = { path = "../utils" }
+common-tracing = { path = "../common/tracing" }
 
 [build-dependencies]
 tonic-build = { version = "0.7", features = ["prost"] }
