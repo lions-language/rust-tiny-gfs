@@ -9,6 +9,8 @@ message CreateFileRequest {
 }
 
 message CreateFileResponse {
+    int32 code = 1;
+    string msg = 2;
 }
 
 message DeleteFileRequest {

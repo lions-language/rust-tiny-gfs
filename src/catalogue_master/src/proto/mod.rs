@@ -22,3 +22,12 @@ impl RegisterResponse {
         }
     }
 }
+
+impl CreateFileResponse {
+    pub fn new_ok() -> Self {
+        Self {
+            code: 0,
+            msg: "success".into(),
+        }
+    }
+}

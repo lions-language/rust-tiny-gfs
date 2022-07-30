@@ -2,7 +2,7 @@ use crate::Result;
 
 use tonic::{Request, Response, Status};
 
-use log::info;
+use log::{error, info};
 
 use crate::proto::catalogue::{catalogue_service_server::*, *};
 
@@ -39,8 +39,11 @@ impl CatalogueService for CatalogueServiceImpl {
             .create_file(request.into_inner())
             .await
         {
-            Ok(file) => {}
-            Err(err) => {}
+            Ok(file) => Ok(Response::new(CreateFileResponse::new_ok())),
+            Err(err) => {
+                error!("insert failed = {}", err);
+                Err(Status::internal(err.to_string()))
+            }
         }
     }
 

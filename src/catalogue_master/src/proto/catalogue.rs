@@ -11,6 +11,10 @@ pub struct CreateFileRequest {
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateFileResponse {
+    #[prost(int32, tag="1")]
+    pub code: i32,
+    #[prost(string, tag="2")]
+    pub msg: ::prost::alloc::string::String,
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 #[derive(Clone, PartialEq, ::prost::Message)]
