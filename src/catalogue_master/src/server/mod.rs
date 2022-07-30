@@ -8,14 +8,12 @@ use std::sync::Arc;
 use log::info;
 use tokio::sync::RwLock;
 
-use tiny_gfs_utils::{init_simple_file_log, SimpleFileLog};
+use tiny_gfs_utils::init_simple_file_log;
 
-use crate::chunk::{ChunkHandler, ChunkOperator, IdGeneratorMode, StorageFactory, StorageMode};
+use crate::chunk::{ChunkHandler, IdGeneratorMode, StorageFactory, StorageMode};
 use crate::proto::catalogue_service_server::CatalogueServiceServer;
 use crate::Result;
 
-use allocer::Allocer;
-use metadata::MetadataFactory;
 use service::CatalogueServiceImpl;
 
 pub use metadata::MetadataMode;
@@ -32,8 +30,11 @@ impl Server {
             chunk_storage_mode,
         )?));
 
-        let mut chunk_handler = ChunkHandler::new(chunk_storage.clone())?;
-        chunk_handler.start(IdGeneratorMode::Memory)?;
+        let cs = chunk_storage.clone();
+        std::thread::spawn(move || {
+            let mut chunk_handler = ChunkHandler::new(cs).unwrap();
+            chunk_handler.start(IdGeneratorMode::Memory).unwrap();
+        });
 
         self.start_service(metadata_mode)?;
 
@@ -49,7 +50,7 @@ impl Server {
         let rt = Runtime::new()?;
 
         let addr = "[::1]:10010".parse().unwrap();
-        let mut s = CatalogueServiceImpl::new(metadata_mode)?;
+        let s = CatalogueServiceImpl::new(metadata_mode)?;
 
         init_simple_file_log(tiny_gfs_utils::SimpleFileLog {
             name: "catalogue_master_service_log",

@@ -1,21 +1,12 @@
-use crate::{Chunk, Error, Result};
+use crate::Result;
 
-use futures::Stream;
-use tokio::sync::{mpsc, RwLock};
-use tokio::time::{self, Duration, Interval};
-use tonic::{transport::Server, Request, Response, Status, Streaming};
+use tonic::{Request, Response, Status};
 
-use std::collections::HashMap;
-use std::fs::File;
-use std::pin::Pin;
-use std::sync::Arc;
-use std::{error::Error as StdError, io::ErrorKind};
-
-use log::{error, info, warn};
+use log::info;
 
 use crate::proto::catalogue::{catalogue_service_server::*, *};
 
-use super::filemgr::{new_shared_file_mgr, FileMgr, FileMgrArc};
+use super::filemgr::{new_shared_file_mgr, FileMgrArc};
 use super::metadata::MetadataMode;
 
 pub(crate) struct CatalogueServiceImpl {
@@ -41,10 +32,16 @@ impl CatalogueService for CatalogueServiceImpl {
             request.remote_addr()
         );
 
-        // 1. get chunks via file name
-
-        // Ok(Response::new(CreateFileResponse::new_ok(chunk_id)))
-        unimplemented!();
+        match self
+            .file_mgr
+            .write()
+            .await
+            .create_file(request.into_inner())
+            .await
+        {
+            Ok(file) => {}
+            Err(err) => {}
+        }
     }
 
     async fn delete_file(
