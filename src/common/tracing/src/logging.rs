@@ -86,12 +86,12 @@ pub fn init_global_tracing(app_name: &str, dir: &str, level: &str) -> Vec<Worker
     guards.push(rolling_writer_guard);
 
     // Jaeger layer.
-    global::set_text_map_propagator(TraceContextPropagator::new());
-    let tracer = opentelemetry_jaeger::new_pipeline()
-        .with_service_name(app_name)
-        .install_batch(opentelemetry::runtime::Tokio)
-        .expect("install");
-    let jaeger_layer = Some(tracing_opentelemetry::layer().with_tracer(tracer));
+    // global::set_text_map_propagator(TraceContextPropagator::new());
+    // let tracer = opentelemetry_jaeger::new_pipeline()
+    //     .with_service_name(app_name)
+    //     .install_batch(opentelemetry::runtime::Tokio)
+    //     .expect("install");
+    // let jaeger_layer = Some(tracing_opentelemetry::layer().with_tracer(tracer));
 
     // Use env RUST_LOG to initialize log if present.
     // Otherwise use the specified level.
@@ -101,8 +101,8 @@ pub fn init_global_tracing(app_name: &str, dir: &str, level: &str) -> Vec<Worker
         .with(env_filter)
         .with(JsonStorageLayer)
         .with(stdout_logging_layer)
-        .with(file_logging_layer)
-        .with(jaeger_layer);
+        .with(file_logging_layer);
+    // .with(jaeger_layer);
 
     #[cfg(feature = "console")]
     let subscriber = subscriber.with(console_subscriber::spawn());

@@ -5,10 +5,9 @@ mod service;
 
 use std::sync::Arc;
 
-use log::info;
 use tokio::sync::RwLock;
 
-use tiny_gfs_utils::init_simple_file_log;
+use common_tracing::tracing::info;
 
 use crate::chunk::{ChunkHandler, IdGeneratorMode, StorageFactory, StorageMode};
 use crate::proto::catalogue_service_server::CatalogueServiceServer;
@@ -52,15 +51,11 @@ impl Server {
         let addr = "[::1]:10010".parse().unwrap();
         let s = CatalogueServiceImpl::new(metadata_mode)?;
 
-        let _guards =
-            common_tracing::init_global_tracing("metactl", "./_metactl_log", &config.log_level);
-
-        init_simple_file_log(tiny_gfs_utils::SimpleFileLog {
-            name: "catalogue_master_service_log",
-            app_name: "app::catalogue_master_service_log",
-            path: "logs/catalogue_master_service.log",
-            level: log::LevelFilter::Info,
-        });
+        let _guards = common_tracing::init_global_tracing(
+            "catalogue_master_service",
+            "logs/catalogue_master_service",
+            log::LevelFilter::Info.as_str(),
+        );
 
         info!("catalogue master service start success");
 
