@@ -51,13 +51,18 @@ impl Server {
         let addr = "[::1]:10010".parse().unwrap();
         let s = CatalogueServiceImpl::new(metadata_mode)?;
 
-        let (_guards, _subscriber) = common_tracing::init_tracing_log(
+        let (_guards, subscriber) = common_tracing::init_tracing_log(
             "catalogue_master_service",
             "logs/catalogue_master_service",
             log::LevelFilter::Info.as_str(),
         );
 
-        info!("catalogue master service start success");
+        common_tracing::tracing::subscriber::with_default(subscriber, || {
+            // tracing::info!("{}", event_str);
+            info!("catalogue master service start success");
+        });
+
+        // info!("catalogue master service start success");
 
         rt.block_on(async {
             tonic::transport::Server::builder()

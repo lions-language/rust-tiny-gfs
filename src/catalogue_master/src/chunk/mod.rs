@@ -141,13 +141,17 @@ impl ChunkHandler {
             return Err(err);
         }
 
-        let (_guards, _subscriber) = common_tracing::init_tracing_log(
+        let (_guards, subscriber) = common_tracing::init_tracing_log(
             "chunk_handler",
             "logs/chunk_handler",
             log::LevelFilter::Info.as_str(),
         );
 
-        info!("chunk handler start success");
+        common_tracing::tracing::subscriber::with_default(subscriber, || {
+            info!("chunk handler start success");
+        });
+
+        // info!("chunk handler start success");
 
         rt.block_on(async {
             Server::builder()
