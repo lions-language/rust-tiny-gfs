@@ -11,7 +11,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 use std::{error::Error as StdError, io::ErrorKind};
 
-use log::{error, info, warn};
+use common_tracing::tracing::{error, info, warn};
 
 use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 

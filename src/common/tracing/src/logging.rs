@@ -56,6 +56,38 @@ pub fn init_default_ut_tracing() {
 static GLOBAL_UT_LOG_GUARD: Lazy<Arc<Mutex<Option<Vec<WorkerGuard>>>>> =
     Lazy::new(|| Arc::new(Mutex::new(None)));
 
+pub fn init_tracing_log(
+    app_name: &str,
+    dir: &str,
+    level: &str,
+) -> (Vec<WorkerGuard>, Arc<dyn Subscriber + Send + Sync>) {
+    let mut guards = vec![];
+
+    // Stdout layer.
+    let (stdout_writer, stdout_guard) = tracing_appender::non_blocking(std::io::stdout());
+    let stdout_logging_layer = Layer::new().with_writer(stdout_writer);
+    guards.push(stdout_guard);
+
+    // JSON log layer.
+    let rolling_appender = RollingFileAppender::new(Rotation::HOURLY, dir, app_name);
+    let (rolling_writer, rolling_writer_guard) = tracing_appender::non_blocking(rolling_appender);
+    let file_logging_layer = BunyanFormattingLayer::new(app_name.to_string(), rolling_writer);
+    guards.push(rolling_writer_guard);
+
+    // Use env RUST_LOG to initialize log if present.
+    // Otherwise use the specified level.
+    let directives = env::var(EnvFilter::DEFAULT_ENV).unwrap_or_else(|_x| level.to_string());
+    let env_filter = EnvFilter::new(directives);
+    let subscriber = Registry::default()
+        .with(env_filter)
+        .with(JsonStorageLayer)
+        .with(stdout_logging_layer)
+        .with(file_logging_layer);
+    // .with(jaeger_layer);
+
+    (guards, Arc::new(subscriber))
+}
+
 /// Init logging and tracing.
 ///
 /// A local tracing collection(maybe for testing) can be done with a local jaeger server.

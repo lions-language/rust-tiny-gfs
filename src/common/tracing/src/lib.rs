@@ -20,6 +20,7 @@ pub use logging::init_default_ut_tracing;
 pub use logging::init_global_tracing;
 pub use logging::init_meta_ut_tracing;
 pub use logging::init_query_logger;
+pub use logging::init_tracing_log;
 pub use panic_hook::set_panic_hook;
 pub use tracing;
 pub use tracing_appender;

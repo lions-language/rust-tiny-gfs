@@ -51,7 +51,7 @@ impl Server {
         let addr = "[::1]:10010".parse().unwrap();
         let s = CatalogueServiceImpl::new(metadata_mode)?;
 
-        let _guards = common_tracing::init_global_tracing(
+        let (_guards, _subscriber) = common_tracing::init_tracing_log(
             "catalogue_master_service",
             "logs/catalogue_master_service",
             log::LevelFilter::Info.as_str(),

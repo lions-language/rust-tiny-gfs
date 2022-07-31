@@ -20,14 +20,14 @@ use tokio::sync::{mpsc, RwLock};
 use tokio::time::{self, Duration};
 use tonic::transport::Server;
 
-use log::{error, info, warn};
+use common_tracing::tracing::{error, info, warn};
 
 use std::collections::HashMap;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::{error::Error as StdError, io::ErrorKind};
 
-use tiny_gfs_utils::init_simple_file_log;
+// use tiny_gfs_utils::init_simple_file_log;
 
 use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
@@ -141,12 +141,11 @@ impl ChunkHandler {
             return Err(err);
         }
 
-        init_simple_file_log(tiny_gfs_utils::SimpleFileLog {
-            name: "chunk_handler_log",
-            app_name: "app::chunk_handler_log",
-            path: "logs/chunk_handler.log",
-            level: log::LevelFilter::Info,
-        });
+        let (_guards, _subscriber) = common_tracing::init_tracing_log(
+            "chunk_handler",
+            "logs/chunk_handler",
+            log::LevelFilter::Info.as_str(),
+        );
 
         info!("chunk handler start success");
 
