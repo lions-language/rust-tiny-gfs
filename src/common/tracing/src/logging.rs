@@ -67,8 +67,8 @@ pub fn init_tracing_log(
     let (rolling_writer, rolling_writer_guard) = tracing_appender::non_blocking(rolling_appender);
     let format = tracing_subscriber::fmt::format()
         // .without_time()
-        .with_target(false)
-        .with_level(false)
+        // .with_target(false)
+        // .with_level(false)
         .compact();
     // .with_file(true)
     // .with_line_number(true)
@@ -85,8 +85,7 @@ pub fn init_tracing_log(
         .with_writer(rolling_writer)
         .event_format(format)
         .with_target(false) // don't include event targets when logging
-        .with_level(false)
-        .pretty(); // don't include event levels when logging
+        .with_level(false); // don't include event levels when logging
 
     let subscriber = Registry::default().with(fmt_layer);
 

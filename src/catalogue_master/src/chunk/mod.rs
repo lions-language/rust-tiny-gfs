@@ -33,14 +33,36 @@ use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 type ArcStorage = Arc<RwLock<Box<dyn Storage + Sync + Send>>>;
 
+// lazy_static::lazy_static! {
+//     /// This is an example for using doc comment attributes
+//     static ref g_chunk_handler_log_subscriber: Option<Arc<dyn common_tracing::tracing::Subscriber + Send + Sync>> = None;
+// }
+
+static mut g_chunk_handler_log_subscriber: Option<
+    Arc<dyn common_tracing::tracing::Subscriber + Send + Sync>,
+> = None;
+
+// macro_rules! sub_info {
+//     ($subscriber:expr, $format:expr, $($field:expr)*) => {
+//         common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+//             info!($format, $($field)*);
+//         });
+//     };
+//     ($subscriber:expr, $format:expr) => {
+//         common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+//             info!($format);
+//         });
+//     };
+// }
+
 macro_rules! sub_info {
-    ($subscriber:expr, $format:expr, $($field:expr)*) => {
-        common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+    ($format:expr, $($field:expr)*) => {
+        common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap(), || {
             info!($format, $($field)*);
         });
     };
-    ($subscriber:expr, $format:expr) => {
-        common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+    ($format:expr) => {
+        common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap().clone(), || {
             info!($format);
         });
     };
@@ -154,13 +176,24 @@ impl ChunkHandler {
             return Err(err);
         }
 
-        let (_guards, subscriber) = common_tracing::init_tracing_log(
+        let (_guards, mut subscriber) = common_tracing::init_tracing_log(
             "chunk_handler",
             "logs/chunk_handler",
             log::LevelFilter::Info.as_str(),
         );
 
-        sub_info!(subscriber, "chunk handler start success");
+        // g_chunk_handler_log_subscriber
+        //     .as_mut()
+        //     .replace(&mut subscriber);
+
+        unsafe {
+            g_chunk_handler_log_subscriber = Some(subscriber);
+        }
+
+        // sub_info!(subscriber, "chunk handler start success");
+        unsafe {
+            sub_info!("chunk handler start success");
+        }
 
         // common_tracing::tracing::subscriber::with_default(subscriber, || {
         //     info!("chunk handler start success");
