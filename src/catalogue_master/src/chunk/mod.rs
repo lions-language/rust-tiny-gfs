@@ -33,6 +33,19 @@ use crate::proto::chunk_handler::{chunk_handler_service_server::*, *};
 
 type ArcStorage = Arc<RwLock<Box<dyn Storage + Sync + Send>>>;
 
+macro_rules! sub_info {
+    ($subscriber:expr, $format:expr, $($field:expr)*) => {
+        common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+            info!($format, $($field)*);
+        });
+    };
+    ($subscriber:expr, $format:expr) => {
+        common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+            info!($format);
+        });
+    };
+}
+
 pub(crate) struct HeartbeatBuffer {
     chunk_ids: HashMap<String, u64>,
 }
@@ -147,9 +160,11 @@ impl ChunkHandler {
             log::LevelFilter::Info.as_str(),
         );
 
-        common_tracing::tracing::subscriber::with_default(subscriber, || {
-            info!("chunk handler start success");
-        });
+        sub_info!(subscriber, "chunk handler start success");
+
+        // common_tracing::tracing::subscriber::with_default(subscriber, || {
+        //     info!("chunk handler start success");
+        // });
 
         // info!("chunk handler start success");
 
