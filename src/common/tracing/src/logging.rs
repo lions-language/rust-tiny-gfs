@@ -63,27 +63,32 @@ pub fn init_tracing_log(
 ) -> (Vec<WorkerGuard>, Arc<dyn Subscriber + Send + Sync>) {
     let mut guards = vec![];
 
-    // Stdout layer.
-    let (stdout_writer, stdout_guard) = tracing_appender::non_blocking(std::io::stdout());
-    let stdout_logging_layer = Layer::new().with_writer(stdout_writer);
-    guards.push(stdout_guard);
-
-    // JSON log layer.
     let rolling_appender = RollingFileAppender::new(Rotation::HOURLY, dir, app_name);
     let (rolling_writer, rolling_writer_guard) = tracing_appender::non_blocking(rolling_appender);
-    let file_logging_layer = BunyanFormattingLayer::new(app_name.to_string(), rolling_writer);
+    let format = tracing_subscriber::fmt::format()
+        // .without_time()
+        .with_target(false)
+        .with_level(false)
+        .compact();
+    // .with_file(true)
+    // .with_line_number(true)
+    // .with_source_location(true);
+    // .compact();
     guards.push(rolling_writer_guard);
 
-    // Use env RUST_LOG to initialize log if present.
-    // Otherwise use the specified level.
-    let directives = env::var(EnvFilter::DEFAULT_ENV).unwrap_or_else(|_x| level.to_string());
-    let env_filter = EnvFilter::new(directives);
-    let subscriber = Registry::default()
-        .with(env_filter)
-        .with(JsonStorageLayer)
-        .with(stdout_logging_layer)
-        .with(file_logging_layer);
-    // .with(jaeger_layer);
+    // let subscriber = tracing_subscriber::fmt()
+    //     .with_writer(rolling_writer)
+    //     .event_format(format)
+    //     .finish();
+
+    let fmt_layer = fmt::layer()
+        .with_writer(rolling_writer)
+        .event_format(format)
+        .with_target(false) // don't include event targets when logging
+        .with_level(false)
+        .pretty(); // don't include event levels when logging
+
+    let subscriber = Registry::default().with(fmt_layer);
 
     (guards, Arc::new(subscriber))
 }
