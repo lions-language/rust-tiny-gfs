@@ -57,14 +57,18 @@ static mut g_chunk_handler_log_subscriber: Option<
 
 macro_rules! sub_info {
     ($format:expr, $($field:expr)*) => {
-        common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap(), || {
-            info!($format, $($field)*);
-        });
+        unsafe {
+            common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap(), || {
+                info!($format, $($field)*);
+            });
+        }
     };
     ($format:expr) => {
-        common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap().clone(), || {
-            info!($format);
-        });
+        unsafe {
+            common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap().clone(), || {
+                info!($format);
+            });
+        }
     };
 }
 
@@ -191,9 +195,7 @@ impl ChunkHandler {
         }
 
         // sub_info!(subscriber, "chunk handler start success");
-        unsafe {
-            sub_info!("chunk handler start success");
-        }
+        sub_info!("chunk handler start success");
 
         // common_tracing::tracing::subscriber::with_default(subscriber, || {
         //     info!("chunk handler start success");
