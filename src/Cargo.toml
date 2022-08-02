@@ -6,4 +6,6 @@ members = [
     "catalogue_master",
     "catalogue_master/tests/chunk_handler_heartbeat",
     "catalogue_master/tests/chunk_handler_register",
+
+    "examples/tracing-test",
 ]
