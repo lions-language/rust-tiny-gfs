@@ -11,13 +11,11 @@ pub fn custom_field() {
 }
 
 pub fn use_local_time() {
-    use tracing_subscriber::{fmt::format, prelude::*};
+    use tracing_subscriber::fmt::time::LocalTime;
 
-    let format =
-        format::debug_fn(|writer, field, value| write!(writer, "{} => {:?}", field, value))
-            .delimited(", ");
-
-    tracing_subscriber::fmt().fmt_fields(format).init();
+    tracing_subscriber::fmt()
+        .with_timer(LocalTime::rfc_3339())
+        .init();
 
     tracing::info!("hello");
 }
