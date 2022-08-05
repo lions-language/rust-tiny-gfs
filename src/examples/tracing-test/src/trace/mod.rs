@@ -12,5 +12,11 @@ pub fn print_trace() {
         .with_ansi(false)
         .init();
 
-    tracing::info!("hello");
+    {
+        let span = tracing::span!(tracing::Level::INFO, "my span");
+
+        tracing::event!(parent: &span, tracing::Level::INFO, "hello");
+
+        tracing::info!("my span");
+    }
 }
