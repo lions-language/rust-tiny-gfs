@@ -13,4 +13,5 @@ fn main() {
     // simple_file::global_config_to_file();
 
     trace::print_trace();
+    // trace::print_trace_v2();
 }
