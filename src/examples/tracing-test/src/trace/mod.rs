@@ -66,19 +66,27 @@ pub fn print_trace_in_scope() {
         .init();
 
     {
-        let span = tracing::span!(tracing::Level::INFO, "my span");
+        let span = tracing::span!(tracing::Level::INFO, "root-span");
 
         span.in_scope(|| {
-            let inner_span = info_span!("hello_world");
+            let inner_span = info_span!("span-1");
             // the span will be entered for the duration of the call to
             // `hello_world`.
             inner_span.in_scope(|| {
-                info!("hello 3");
+                info!("hello 1");
+
+                let inner_span = info_span!("span-2");
+                inner_span.in_scope(|| {
+                    info!("hello 2");
+
+                    let inner_span = info_span!("span-1");
+                    inner_span.in_scope(|| {
+                        info!("hello 3");
+                    });
+                });
             });
 
-            info!("hello 1");
+            info!("world 1");
         });
-
-        info!("hello 2");
     }
 }
