@@ -1,7 +1,12 @@
 use crate::basic::spans_record_test;
 
 pub fn print_trace() {
+    use tracing::{event, info, Span};
     use tracing_subscriber::fmt::writer::MakeWriterExt;
+
+    let inner_fn = |span: &Span| {
+        event!(parent: span, tracing::Level::INFO, "inner fn hello");
+    };
 
     let stdout = std::io::stdout.with_max_level(tracing::Level::INFO);
 
@@ -15,10 +20,12 @@ pub fn print_trace() {
         .init();
 
     {
-        let span = tracing::span!(tracing::Level::INFO, "my span");
+        let span1 = tracing::span!(tracing::Level::INFO, "span-1");
 
-        tracing::event!(parent: &span, tracing::Level::INFO, "hello");
-        tracing::event!(parent: &span, tracing::Level::INFO, "world");
+        tracing::event!(parent: &span1, tracing::Level::INFO, "hello 1");
+        tracing::event!(parent: &span1, tracing::Level::INFO, "hello 2");
+
+        inner_fn(&span1);
 
         tracing::info!("my span");
     }
