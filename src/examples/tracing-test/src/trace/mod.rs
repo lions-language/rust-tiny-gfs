@@ -99,3 +99,31 @@ pub fn print_trace_in_scope() {
         });
     }
 }
+
+#[tracing::instrument]
+fn f1() {
+    tracing::info!("hello f1");
+}
+
+#[tracing::instrument]
+fn f2() {
+    tracing::info!("hello f2");
+    f1();
+}
+
+pub fn use_instrument() {
+    use tracing_subscriber::fmt::writer::MakeWriterExt;
+
+    let stdout = std::io::stdout.with_max_level(tracing::Level::INFO);
+
+    tracing_subscriber::fmt()
+        // merge stdio and file
+        .with_writer(stdout)
+        // disenable ANSI terminal colors for formatted output
+        .with_ansi(false)
+        .init();
+
+    tracing::info!("outside log: hello");
+
+    f2();
+}
