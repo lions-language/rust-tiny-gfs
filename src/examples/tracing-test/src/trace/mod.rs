@@ -31,7 +31,7 @@ pub fn print_trace() {
     }
 }
 
-pub fn print_trace_v2() {
+pub fn print_trace_use_enter() {
     use tracing_subscriber::fmt::writer::MakeWriterExt;
 
     let stdout = std::io::stdout.with_max_level(tracing::Level::INFO);
@@ -48,12 +48,14 @@ pub fn print_trace_v2() {
     {
         let span = tracing::span!(tracing::Level::INFO, "my span");
 
-        let _enter = span.enter();
+        {
+            let _enter = span.enter();
 
-        tracing::event!(tracing::Level::INFO, "hello");
-        tracing::event!(tracing::Level::INFO, "world");
+            tracing::event!(tracing::Level::INFO, "hello 1");
+            tracing::event!(tracing::Level::INFO, "hello 2");
+        }
 
-        tracing::info!("my span");
+        tracing::info!("hello 3");
     }
 }
 
