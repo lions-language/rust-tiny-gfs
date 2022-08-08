@@ -17,5 +17,6 @@ fn main() {
     // trace::use_instrument();
 
     use tracing_test::macros;
-    macros::use_debug_derive();
+    // macros::use_debug_derive();
+    macros::use_display_derive();
 }

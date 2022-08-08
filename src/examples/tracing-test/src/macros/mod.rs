@@ -18,15 +18,25 @@ pub fn use_debug_derive() {
 pub fn use_display_derive() {
     crate::init_stdout();
 
+    use std::fmt;
+
     struct MyStruct {
         field: &'static str,
+    }
+
+    impl fmt::Display for MyStruct {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            write!(f, "{}", self.field)
+        }
     }
 
     let my_struct = MyStruct {
         field: "Hello world!",
     };
 
-    // `my_struct` will be recorded using its `fmt::Debug` implementation.
+    // display for struct field
+    tracing::event!(tracing::Level::INFO, greeting = %my_struct.field);
+
+    // display for struct
     tracing::event!(tracing::Level::INFO, greeting = %my_struct);
-    // tracing::info!("hello");
 }
