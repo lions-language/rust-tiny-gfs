@@ -18,5 +18,6 @@ fn main() {
 
     use tracing_test::macros;
     // macros::use_debug_derive();
-    macros::use_display_derive();
+    // macros::use_display_derive();
+    macros::use_empty();
 }

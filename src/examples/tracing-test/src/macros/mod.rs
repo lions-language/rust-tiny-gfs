@@ -40,3 +40,11 @@ pub fn use_display_derive() {
     // display for struct
     tracing::event!(tracing::Level::INFO, greeting = %my_struct);
 }
+
+pub fn use_empty() {
+    crate::init_stdout();
+
+    // display for struct field
+    let span = tracing::info_span!("span 1", xxx = tracing::field::Empty);
+    span.record("xxx", &"hello");
+}
