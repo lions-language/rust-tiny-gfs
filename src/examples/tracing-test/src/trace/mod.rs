@@ -1,7 +1,5 @@
-use crate::basic::spans_record_test;
-
 pub fn print_trace() {
-    use tracing::{event, info, Span};
+    use tracing::{event, Span};
     use tracing_subscriber::fmt::writer::MakeWriterExt;
 
     let inner_fn = |span: &Span| {

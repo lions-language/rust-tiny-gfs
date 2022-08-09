@@ -1,4 +1,4 @@
-use tracing::{event, instrument::WithSubscriber};
+use tracing::event;
 
 pub fn spans_test() {
     use tracing::{span, Level};
@@ -22,7 +22,7 @@ pub fn spans_record_test() {
 }
 
 pub fn event_test() {
-    use tracing::{event, span, Level};
+    use tracing::{span, Level};
     let span = span!(Level::TRACE, "my_span");
     let _enter = span.enter();
     event!(parent: &span, Level::INFO, "hello");
