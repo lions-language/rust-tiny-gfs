@@ -16,9 +16,12 @@ fn main() {
     // trace::print_trace_in_scope();
     // trace::use_instrument();
 
-    use tracing_test::macros;
+    // use tracing_test::macros;
     // macros::use_debug_derive();
     // macros::use_display_derive();
     // macros::build_span_use_empty();
-    macros::use_kv_in_event();
+    // macros::use_kv_in_event();
+
+    use tracing_test::subscribers;
+    subscribers::use_with_default();
 }

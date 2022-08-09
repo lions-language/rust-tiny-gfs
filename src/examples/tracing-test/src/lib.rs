@@ -2,6 +2,7 @@ pub mod basic;
 pub mod custom_field;
 pub mod macros;
 pub mod simple_file;
+pub mod subscribers;
 pub mod trace;
 
 fn init_stdout() {
