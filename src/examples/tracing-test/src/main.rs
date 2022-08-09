@@ -19,5 +19,6 @@ fn main() {
     use tracing_test::macros;
     // macros::use_debug_derive();
     // macros::use_display_derive();
-    macros::build_span_use_empty();
+    // macros::build_span_use_empty();
+    macros::use_kv_in_event();
 }

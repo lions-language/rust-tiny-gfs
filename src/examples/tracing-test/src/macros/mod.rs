@@ -44,10 +44,25 @@ pub fn use_display_derive() {
 pub fn build_span_use_empty() {
     crate::init_stdout();
 
-    // display for struct field
     let span = tracing::info_span!("span 1", xxx = tracing::field::Empty);
 
     span.record("xxx", &"hello 1");
 
     tracing::event!(parent: &span, tracing::Level::INFO, "hello 2");
+}
+
+pub fn use_kv_in_event() {
+    crate::init_stdout();
+
+    let name = "Mike";
+
+    tracing::event!(
+        tracing::Level::INFO,
+        xxx1 = "xxx1",
+        xxx2 = "xxx2",
+        "hello {}",
+        name
+    );
+
+    // 2022-08-09T15:10:23.969792Z  INFO tracing_test::macros: hello Mike xxx1="xxx1" xxx2="xxx2"
 }
