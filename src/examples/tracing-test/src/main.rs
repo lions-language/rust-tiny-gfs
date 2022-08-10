@@ -23,5 +23,6 @@ fn main() {
     // macros::use_kv_in_event();
 
     use tracing_test::subscribers;
-    subscribers::use_with_default();
+    // subscribers::use_with_default();
+    subscribers::simple_file_with_default();
 }
