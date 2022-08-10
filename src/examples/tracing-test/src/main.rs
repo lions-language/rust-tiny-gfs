@@ -24,5 +24,6 @@ fn main() {
 
     use tracing_test::subscribers;
     // subscribers::use_with_default();
-    subscribers::simple_file_with_default();
+    // subscribers::simple_file_with_default();
+    subscribers::multi_simple_file_with_default();
 }
