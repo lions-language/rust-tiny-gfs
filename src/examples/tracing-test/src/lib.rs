@@ -5,6 +5,7 @@ pub mod simple_file;
 pub mod subscribers;
 pub mod trace;
 
+pub mod custom_rolling;
 pub mod library;
 
 fn init_stdout() {

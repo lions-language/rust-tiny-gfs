@@ -1,5 +1,5 @@
 fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) {
-    let file_appender = tracing_appender::rolling::hourly(dir, name);
+    let file_appender = crate::custom_rolling::hourly(dir, name);
 
     let subscriber = tracing_subscriber::fmt()
         .with_writer(file_appender)
@@ -11,7 +11,7 @@ fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) {
     tracing::subscriber::with_default(subscriber, f);
 }
 
-fn test() {
+pub fn test() {
     create_appender_log("log1", ".logs", || {
         tracing::info!("hello 1");
     });

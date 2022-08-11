@@ -30,7 +30,6 @@
 //! let file_appender = RollingFileAppender::new(Rotation::HOURLY, "/some/directory", "prefix.log");
 //! # }
 //! ```
-use crate::sync::{RwLock, RwLockReadGuard};
 use std::{
     fmt::{self, Debug},
     fs::{self, File, OpenOptions},
@@ -38,7 +37,10 @@ use std::{
     path::Path,
     sync::atomic::{AtomicUsize, Ordering},
 };
+use sync::{RwLock, RwLockReadGuard};
 use time::{format_description, Duration, OffsetDateTime, Time};
+
+mod sync;
 
 /// A file appender with the ability to rotate log files at a fixed schedule.
 ///

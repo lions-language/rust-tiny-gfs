@@ -22,9 +22,12 @@ fn main() {
     // macros::build_span_use_empty();
     // macros::use_kv_in_event();
 
-    use tracing_test::subscribers;
+    // use tracing_test::subscribers;
     // subscribers::use_with_default();
     // subscribers::simple_file_with_default();
     // subscribers::multi_simple_file_with_default();
-    subscribers::thread_in_with_default();
+    // subscribers::thread_in_with_default();
+
+    use tracing_test::library;
+    library::test();
 }

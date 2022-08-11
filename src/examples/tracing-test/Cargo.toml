@@ -9,3 +9,5 @@ edition = "2021"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["std", "fmt", "time", "local-time"] }
 tracing-appender = { version = "0.2" }
+
+time = "0.3"
