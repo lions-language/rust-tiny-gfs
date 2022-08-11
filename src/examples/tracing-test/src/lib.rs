@@ -5,6 +5,8 @@ pub mod simple_file;
 pub mod subscribers;
 pub mod trace;
 
+pub mod library;
+
 fn init_stdout() {
     use tracing_subscriber::fmt::writer::MakeWriterExt;
 
