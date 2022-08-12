@@ -3,7 +3,7 @@ fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) {
 
     let file_appender = crate::custom_rolling::hourly(dir, name);
 
-    let (non_blocking_appender, _guard) = tracing_appender::non_blocking(file_appender);
+    let (non_blocking_appender, _guard) = crate::custom_rolling::non_blocking(file_appender);
 
     let subscriber = tracing_subscriber::fmt()
         .with_writer(non_blocking_appender)

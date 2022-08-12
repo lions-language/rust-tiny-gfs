@@ -40,7 +40,21 @@ use std::{
 use sync::{RwLock, RwLockReadGuard};
 use time::{format_description, Duration, OffsetDateTime, Time};
 
+pub mod non_blocking;
 mod sync;
+mod worker;
+
+use non_blocking::{NonBlocking, WorkerGuard};
+
+pub fn non_blocking<T: Write + Send + Sync + 'static>(writer: T) -> (NonBlocking, WorkerGuard) {
+    NonBlocking::new(writer)
+}
+
+#[derive(Debug)]
+pub(crate) enum Msg {
+    Line(Vec<u8>),
+    Shutdown,
+}
 
 /// A file appender with the ability to rotate log files at a fixed schedule.
 ///
