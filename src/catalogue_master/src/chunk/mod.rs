@@ -38,40 +38,6 @@ type ArcStorage = Arc<RwLock<Box<dyn Storage + Sync + Send>>>;
 //     static ref g_chunk_handler_log_subscriber: Option<Arc<dyn common_tracing::tracing::Subscriber + Send + Sync>> = None;
 // }
 
-static mut g_chunk_handler_log_subscriber: Option<
-    Arc<dyn common_tracing::tracing::Subscriber + Send + Sync>,
-> = None;
-
-// macro_rules! sub_info {
-//     ($subscriber:expr, $format:expr, $($field:expr)*) => {
-//         common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
-//             info!($format, $($field)*);
-//         });
-//     };
-//     ($subscriber:expr, $format:expr) => {
-//         common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
-//             info!($format);
-//         });
-//     };
-// }
-
-macro_rules! sub_info {
-    ($format:expr, $($field:expr)*) => {
-        unsafe {
-            common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap(), || {
-                info!($format, $($field)*);
-            });
-        }
-    };
-    ($format:expr) => {
-        unsafe {
-            common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap().clone(), || {
-                info!($format);
-            });
-        }
-    };
-}
-
 pub(crate) struct HeartbeatBuffer {
     chunk_ids: HashMap<String, u64>,
 }

@@ -25,6 +25,7 @@ log = "0.4"
 
 tiny_gfs_utils = { path = "../utils" }
 common-tracing = { path = "../common/tracing" }
+common-file-tracing = { path = "../common/file_tracing" }
 
 lazy_static = "1.4"
 

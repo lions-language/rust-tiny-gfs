@@ -42,3 +42,53 @@ macro_rules! func_name {
         nn
     }};
 }
+
+static mut g_chunk_handler_log_subscriber: Option<
+    std::sync::Arc<dyn tracing::Subscriber + Send + Sync>,
+> = None;
+
+// macro_rules! sub_info {
+//     ($subscriber:expr, $format:expr, $($field:expr)*) => {
+//         common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+//             info!($format, $($field)*);
+//         });
+//     };
+//     ($subscriber:expr, $format:expr) => {
+//         common_tracing::tracing::subscriber::with_default($subscriber.clone(), || {
+//             info!($format);
+//         });
+//     };
+// }
+
+macro_rules! sub_info {
+    ($format:expr, $($field:expr)*) => {
+        unsafe {
+            common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap(), || {
+                info!($format, $($field)*);
+            });
+        }
+    };
+    ($format:expr) => {
+        unsafe {
+            common_tracing::tracing::subscriber::with_default(g_chunk_handler_log_subscriber.as_ref().unwrap().clone(), || {
+                info!($format);
+            });
+        }
+    };
+}
+
+fn test() {
+    let (_guards, mut subscriber) = init_tracing_log(
+        "chunk_handler",
+        "logs/chunk_handler",
+        log::LevelFilter::Info.as_str(),
+    );
+
+    // g_chunk_handler_log_subscriber
+    //     .as_mut()
+    //     .replace(&mut subscriber);
+
+    unsafe {
+        g_chunk_handler_log_subscriber = Some(subscriber);
+    }
+}

@@ -1,0 +1,17 @@
+[package]
+name = "common-file-tracing"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["std", "fmt", "time", "local-time"] }
+tracing-appender = { version = "0.2" }
+
+time = { version = "0.3" }
+
+tempfile = "3.3"
+
+crossbeam-channel = "0.5"
