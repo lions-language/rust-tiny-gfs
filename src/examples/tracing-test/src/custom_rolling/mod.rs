@@ -145,14 +145,18 @@ impl RollingFileAppender {
         directory: impl AsRef<Path>,
         file_name_prefix: impl AsRef<Path>,
     ) -> RollingFileAppender {
-        let now = OffsetDateTime::now_utc();
+        let now = RollingFileAppender::local_time_offset_datetime();
         let (state, writer) = Inner::new(now, rotation, directory, file_name_prefix);
         Self {
             state,
             writer,
             #[cfg(test)]
-            now: Box::new(OffsetDateTime::now_utc),
+            now: Box::new(RollingFileAppender::local_time_offset_datetime),
         }
+    }
+
+    fn local_time_offset_datetime() -> OffsetDateTime {
+        OffsetDateTime::now_local().unwrap()
     }
 
     #[inline]
