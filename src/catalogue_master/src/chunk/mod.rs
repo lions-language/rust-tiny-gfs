@@ -146,36 +146,19 @@ impl ChunkHandler {
             return Err(err);
         }
 
-        let (_guards, mut subscriber) = common_tracing::init_tracing_log(
-            "chunk_handler",
-            "logs/chunk_handler",
-            log::LevelFilter::Info.as_str(),
-        );
+        common_file_tracing::create_appender_log("chunk_handler", "logs", || {
+            info!("chunk handler start success");
 
-        // g_chunk_handler_log_subscriber
-        //     .as_mut()
-        //     .replace(&mut subscriber);
-
-        unsafe {
-            g_chunk_handler_log_subscriber = Some(subscriber);
-        }
-
-        // sub_info!(subscriber, "chunk handler start success");
-        sub_info!("chunk handler start success");
-
-        // common_tracing::tracing::subscriber::with_default(subscriber, || {
-        //     info!("chunk handler start success");
-        // });
-
-        // info!("chunk handler start success");
-
-        rt.block_on(async {
-            Server::builder()
-                .add_service(ChunkHandlerServiceServer::new(s))
-                .serve(addr)
-                .await
-                .unwrap();
+            rt.block_on(async {
+                Server::builder()
+                    .add_service(ChunkHandlerServiceServer::new(s))
+                    .serve(addr)
+                    .await
+                    .unwrap();
+            });
         });
+
+        // sub_info!("chunk handler start success");
 
         Ok(())
     }
