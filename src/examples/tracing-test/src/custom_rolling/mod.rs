@@ -170,7 +170,11 @@ impl RollingFileAppender {
     }
 
     fn local_time_offset_datetime() -> OffsetDateTime {
-        OffsetDateTime::now_local().unwrap()
+        if let Ok(t) = OffsetDateTime::now_local() {
+            t
+        } else {
+            OffsetDateTime::now_utc()
+        }
     }
 
     #[inline]

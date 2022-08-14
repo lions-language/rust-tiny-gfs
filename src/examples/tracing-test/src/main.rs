@@ -32,5 +32,6 @@ fn main() {
     // library::test();
 
     use tracing_test::in_future;
-    in_future::print_in_tokio_runtime();
+    // in_future::tokio_runtime_to_stdout();
+    in_future::tokio_runtime_to_file();
 }
