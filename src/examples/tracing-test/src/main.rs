@@ -28,6 +28,9 @@ fn main() {
     // subscribers::multi_simple_file_with_default();
     // subscribers::thread_in_with_default();
 
-    use tracing_test::library;
-    library::test();
+    // use tracing_test::library;
+    // library::test();
+
+    use tracing_test::in_future;
+    in_future::print_in_tokio_runtime();
 }
