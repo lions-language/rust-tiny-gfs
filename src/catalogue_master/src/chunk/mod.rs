@@ -100,67 +100,80 @@ impl ChunkHandler {
         let storage = self.storage.clone();
 
         std::thread::spawn(move || {
-            use tokio::runtime::Runtime;
-            let rt = Runtime::new().unwrap();
+            common_file_tracing::create_appender_log(
+                "async_tasks",
+                "logs/chunk_handler",
+                move || -> Result<()> {
+                    use tokio::runtime::Runtime;
+                    let rt = Runtime::new().unwrap();
 
-            let hb = hb.clone();
-            let storage = storage.clone();
-
-            rt.block_on(async {
-                let mut sleep = time::sleep(Duration::from_millis(1000));
-                tokio::pin!(sleep);
-
-                loop {
                     let hb = hb.clone();
                     let storage = storage.clone();
 
-                    tokio::select! {
-                        _ = &mut sleep => {
-                            ChunkHandler::handle_heartbeat(hb, storage).await;
-                            sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
+                    rt.block_on(async {
+                        let mut sleep = time::sleep(Duration::from_millis(1000));
+                        tokio::pin!(sleep);
+
+                        loop {
+                            let hb = hb.clone();
+                            let storage = storage.clone();
+
+                            tokio::select! {
+                                _ = &mut sleep => {
+                                    ChunkHandler::handle_heartbeat(hb, storage).await;
+                                    sleep.as_mut().reset(time::Instant::now() + Duration::from_millis(1000));
+                                }
+                                // _ = some_async_work() => {
+                                //     println!("operation completed");
+                                // }
+                            }
                         }
-                        // _ = some_async_work() => {
-                        //     println!("operation completed");
-                        // }
-                    }
-                }
-            })
+                    })
+                },
+            )
         });
 
         Ok(())
     }
 
     pub(crate) fn start(&mut self, id_generator_mod: IdGeneratorMode) -> Result<()> {
-        use tokio::runtime::Runtime;
-        let rt = Runtime::new()?;
+        common_file_tracing::create_appender_log(
+            "chunk_handler",
+            "logs/chunk_handler",
+            || -> Result<()> {
+                use tokio::runtime::Runtime;
+                let rt = Runtime::new()?;
 
-        let storage = self.storage.clone();
+                let storage = self.storage.clone();
 
-        let addr = "[::1]:10000".parse().unwrap();
-        let heartbeat_buffer = Arc::new(RwLock::new(HeartbeatBuffer::new()));
-        let mut s =
-            ChunkHandlerServiceImpl::new(heartbeat_buffer.clone(), storage, id_generator_mod)?;
+                let addr = "[::1]:10000".parse().unwrap();
+                let heartbeat_buffer = Arc::new(RwLock::new(HeartbeatBuffer::new()));
+                let mut s = ChunkHandlerServiceImpl::new(
+                    heartbeat_buffer.clone(),
+                    storage,
+                    id_generator_mod,
+                )?;
 
-        if let Err(err) = self.start_async_tasks(heartbeat_buffer) {
-            error!("chunk handler service start failed");
-            return Err(err);
-        }
+                if let Err(err) = self.start_async_tasks(heartbeat_buffer) {
+                    error!("chunk handler service start failed");
+                    return Err(err);
+                }
 
-        common_file_tracing::create_appender_log("chunk_handler", "logs", || {
-            info!("chunk handler start success");
+                info!("chunk handler start success");
 
-            rt.block_on(async {
-                Server::builder()
-                    .add_service(ChunkHandlerServiceServer::new(s))
-                    .serve(addr)
-                    .await
-                    .unwrap();
-            });
-        });
+                rt.block_on(async {
+                    Server::builder()
+                        .add_service(ChunkHandlerServiceServer::new(s))
+                        .serve(addr)
+                        .await
+                        .unwrap();
+                });
 
-        // sub_info!("chunk handler start success");
+                // sub_info!("chunk handler start success");
 
-        Ok(())
+                Ok(())
+            },
+        )
     }
 
     pub(crate) fn new(storage: ArcStorage) -> Result<Self> {

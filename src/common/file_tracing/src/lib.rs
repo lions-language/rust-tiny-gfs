@@ -1,6 +1,6 @@
 mod custom_rolling;
 
-pub fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) {
+pub fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) -> T {
     use tracing_subscriber::fmt::time::LocalTime;
 
     let file_appender = custom_rolling::hourly(dir, name);
@@ -15,5 +15,5 @@ pub fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) {
         .compact()
         .finish();
 
-    tracing::subscriber::with_default(subscriber, f);
+    tracing::subscriber::with_default(subscriber, f)
 }

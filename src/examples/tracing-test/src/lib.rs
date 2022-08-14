@@ -4,6 +4,7 @@ pub mod macros;
 pub mod simple_file;
 pub mod subscribers;
 pub mod trace;
+pub mod in_future;
 
 pub mod custom_rolling;
 pub mod library;
