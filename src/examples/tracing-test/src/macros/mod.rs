@@ -11,7 +11,7 @@ pub fn use_debug_derive() {
     };
 
     // `my_struct` will be recorded using its `fmt::Debug` implementation.
-    tracing::event!(tracing::Level::INFO, greeting = ?my_struct);
+    tracing::event!(tracing::Level::INFO, greeting = ?my_struct, field = my_struct.field);
     // tracing::info!("hello");
 }
 

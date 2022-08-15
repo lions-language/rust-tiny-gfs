@@ -2,7 +2,7 @@ pub fn tokio_runtime_to_stdout() {
     use tracing::info;
 
     let _g = std::thread::spawn(move || {
-        crate::create_stdout_log(move || -> Result<(), String> {
+        crate::library::create_stdout_log(move || -> Result<(), String> {
             info!("log 1");
 
             use tokio::runtime::Runtime;
@@ -46,7 +46,7 @@ pub fn await_to_stdout() {
     };
 
     let _g = std::thread::spawn(move || {
-        crate::create_stdout_log(move || -> Result<(), String> {
+        crate::library::create_stdout_log(move || -> Result<(), String> {
             info!("log 1");
 
             use tokio::runtime::Runtime;
