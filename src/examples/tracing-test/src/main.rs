@@ -33,5 +33,6 @@ fn main() {
 
     use tracing_test::in_future;
     // in_future::tokio_runtime_to_stdout();
-    in_future::tokio_runtime_to_file();
+    // in_future::tokio_runtime_to_file();
+    in_future::await_to_stdout();
 }
