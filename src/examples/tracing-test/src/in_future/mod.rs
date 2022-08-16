@@ -1,8 +1,10 @@
-pub fn tokio_runtime_to_stdout() {
+fn tokio_runtime(
+    w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
+) {
     use tracing::info;
 
     let _g = std::thread::spawn(move || {
-        crate::library::create_stdout_log(move || -> Result<(), String> {
+        crate::library::create_log(w, move || -> Result<(), String> {
             info!("log 1");
 
             use tokio::runtime::Runtime;
@@ -16,29 +18,19 @@ pub fn tokio_runtime_to_stdout() {
         })
     })
     .join();
+}
+
+pub fn tokio_runtime_to_stdout() {
+    tokio_runtime(crate::library::create_stdout());
 }
 
 pub fn tokio_runtime_to_file() {
-    use tracing::info;
-
-    let _g = std::thread::spawn(move || {
-        crate::library::create_appender_log("log1", ".logs", move || -> Result<(), String> {
-            info!("log 1");
-
-            use tokio::runtime::Runtime;
-            let rt = Runtime::new().unwrap();
-
-            rt.block_on(async {
-                info!("log 2");
-            });
-
-            Ok(())
-        })
-    })
-    .join();
+    tokio_runtime(crate::library::create_appender("log1", ".logs"));
 }
 
-pub fn await_to_stdout() {
+fn in_await(
+    w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
+) {
     use tracing::info;
 
     let f = async {
@@ -46,7 +38,7 @@ pub fn await_to_stdout() {
     };
 
     let _g = std::thread::spawn(move || {
-        crate::library::create_stdout_log(move || -> Result<(), String> {
+        crate::library::create_log(w, move || -> Result<(), String> {
             info!("log 1");
 
             use tokio::runtime::Runtime;
@@ -62,4 +54,12 @@ pub fn await_to_stdout() {
         })
     })
     .join();
+}
+
+pub fn in_await_to_stdout() {
+    in_await(crate::library::create_stdout());
+}
+
+pub fn in_await_to_file() {
+    in_await(crate::library::create_appender("log1", ".logs"));
 }
