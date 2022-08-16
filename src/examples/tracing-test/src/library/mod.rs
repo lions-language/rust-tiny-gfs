@@ -34,11 +34,9 @@ pub fn create_appender_log<T>(name: &str, dir: &str, f: impl FnOnce() -> T) -> T
 pub fn create_appender(
     name: &str,
     dir: &str,
-) -> impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync {
+) -> (impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync, crate::custom_rolling::WorkerGuard) {
     let file_appender = crate::custom_rolling::hourly(dir, name);
-    let (non_blocking_appender, _guard) = crate::custom_rolling::non_blocking(file_appender);
-
-    non_blocking_appender
+    crate::custom_rolling::non_blocking(file_appender)
 }
 
 pub fn create_stdout(

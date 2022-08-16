@@ -25,7 +25,8 @@ pub fn tokio_runtime_to_stdout() {
 }
 
 pub fn tokio_runtime_to_file() {
-    tokio_runtime(crate::library::create_appender("log1", ".logs"));
+    let (w, _g) = crate::library::create_appender("log1", ".logs");
+    tokio_runtime(w);
 }
 
 fn in_await(
@@ -61,5 +62,6 @@ pub fn in_await_to_stdout() {
 }
 
 pub fn in_await_to_file() {
-    in_await(crate::library::create_appender("log1", ".logs"));
+    let (w, _g) = crate::library::create_appender("log1", ".logs");
+    in_await(w);
 }

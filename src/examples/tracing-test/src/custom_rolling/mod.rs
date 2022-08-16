@@ -44,7 +44,7 @@ pub mod non_blocking;
 mod sync;
 mod worker;
 
-use non_blocking::{NonBlocking, WorkerGuard};
+pub use non_blocking::{NonBlocking, WorkerGuard};
 
 pub fn non_blocking<T: Write + Send + Sync + 'static>(writer: T) -> (NonBlocking, WorkerGuard) {
     NonBlocking::new(writer)
