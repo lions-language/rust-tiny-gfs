@@ -1,3 +1,4 @@
+/// OK
 fn tokio_runtime(
     w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 ) {
@@ -29,6 +30,7 @@ pub fn tokio_runtime_to_file() {
     tokio_runtime(w);
 }
 
+/// OK
 fn in_await(
     w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 ) {
@@ -66,6 +68,7 @@ pub fn in_await_to_file() {
     in_await(w);
 }
 
+/// OK
 fn in_tokio_sleep(
     w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 ) {
@@ -107,7 +110,7 @@ pub fn in_tokio_sleep_file() {
     in_tokio_sleep(w);
 }
 
-
+/// OK
 fn in_tokio_multi_sleep(
     w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 ) {
@@ -154,4 +157,44 @@ pub fn in_tokio_multi_sleep_stdout() {
 pub fn in_tokio_multi_sleep_file() {
     let (w, _g) = crate::library::create_appender("log1", ".logs");
     in_tokio_multi_sleep(w);
+}
+
+/// Failed
+fn use_spawn(
+    w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
+) {
+    use tracing::info;
+
+    let _g = std::thread::spawn(move || {
+        crate::library::create_log(w, move || -> Result<(), String> {
+            info!("log 1");
+
+            use tokio::runtime::Runtime;
+            let rt = Runtime::new().unwrap();
+
+            rt.block_on(async {
+                // NOTE: print `log 1` only
+                for i in 0..10 {
+                    tokio::spawn(async move {
+                        info!("log {}", i);
+                        tokio::time::sleep(tokio::time::Duration::from_millis(100)).await;
+                    });
+                }
+
+                tokio::time::sleep(tokio::time::Duration::from_millis(1000)).await;
+            });
+
+            Ok(())
+        })
+    })
+    .join();
+}
+
+pub fn use_spawn_stdout() {
+    use_spawn(crate::library::create_stdout());
+}
+
+pub fn use_spawn_file() {
+    let (w, _g) = crate::library::create_appender("log1", ".logs");
+    use_spawn(w);
 }
