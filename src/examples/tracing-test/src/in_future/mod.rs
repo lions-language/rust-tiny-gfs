@@ -101,3 +101,8 @@ fn in_tokio_sleep(
 pub fn in_tokio_sleep_stdout() {
     in_tokio_sleep(crate::library::create_stdout());
 }
+
+pub fn in_tokio_sleep_file() {
+    let (w, _g) = crate::library::create_appender("log1", ".logs");
+    in_tokio_sleep(w);
+}
