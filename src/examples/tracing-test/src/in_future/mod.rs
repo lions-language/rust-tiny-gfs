@@ -199,7 +199,7 @@ pub fn use_spawn_file() {
     use_spawn(w);
 }
 
-/// Unknown
+/// OK
 fn use_local_runtime(
     w: impl for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 ) {
@@ -207,10 +207,10 @@ fn use_local_runtime(
 
     let _g = std::thread::spawn(move || {
         crate::library::create_log(w, move || -> Result<(), String> {
-            info!("log 1");
+            info!("log start");
 
-            use tokio::runtime::Runtime;
-            let rt = Runtime::new().unwrap();
+            use tokio::runtime::Builder;
+            let rt = Builder::new_current_thread().enable_time().build().unwrap();
 
             rt.block_on(async {
                 // NOTE: print `log 1` only
