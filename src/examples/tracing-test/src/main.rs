@@ -39,5 +39,6 @@ fn main() {
     // in_future::in_tokio_sleep_stdout();
     // in_future::in_tokio_sleep_file();
     // in_future::in_tokio_multi_sleep_stdout();
-    in_future::use_spawn_stdout()
+    // in_future::use_spawn_stdout()
+    in_future::use_local_runtime_stdout();
 }
