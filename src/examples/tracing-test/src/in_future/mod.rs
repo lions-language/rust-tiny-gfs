@@ -212,8 +212,6 @@ fn use_tracing_futures(
             use tokio::runtime::Runtime;
             let rt = Runtime::new().unwrap();
 
-            let rt = tracing_futures::WithDispatch::from(rt);
-
             rt.block_on(async {
                 // NOTE: print `log 1` only
                 for i in 0..10 {
