@@ -57,25 +57,18 @@ pub fn test() {
     });
 }
 
-pub fn create_future_log<W, T>(
-    w: W,
-    f: impl FnOnce() -> T,
-) -> (
-    T,
-    tracing_futures::WithDispatch<
-        tracing_subscriber::fmt::Subscriber<
-            tracing_subscriber::fmt::format::DefaultFields,
-            tracing_subscriber::fmt::format::Format<
-                tracing_subscriber::fmt::format::Compact,
-                tracing_subscriber::fmt::time::LocalTime<
-                    time::format_description::well_known::Rfc3339,
-                >,
-            >,
-            tracing_subscriber::filter::LevelFilter,
-            W,
+pub type FutureLogDispatch<W> = tracing_futures::WithDispatch<
+    tracing_subscriber::fmt::Subscriber<
+        tracing_subscriber::fmt::format::DefaultFields,
+        tracing_subscriber::fmt::format::Format<
+            tracing_subscriber::fmt::format::Compact,
+            tracing_subscriber::fmt::time::LocalTime<time::format_description::well_known::Rfc3339>,
         >,
+        tracing_subscriber::filter::LevelFilter,
+        W,
     >,
-)
+>;
+pub fn create_future_log<W, T>(w: W, f: impl FnOnce() -> T) -> (T, FutureLogDispatch<W>)
 where
     W: for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 {
@@ -100,10 +93,17 @@ where
     // tracing::subscriber::with_default(subscriber, f)
 }
 
-pub fn create_future_stdout_log<T>(f: impl FnOnce() -> T) -> T {
+pub fn create_future_stdout_log<T>(
+    f: impl FnOnce() -> T,
+) -> (
+    T,
+    FutureLogDispatch<
+        tracing_subscriber::fmt::writer::WithMaxLevel<impl FnOnce() -> std::io::Stdout>,
+    >,
+) {
     use tracing_subscriber::fmt::writer::MakeWriterExt;
 
     let stdout = std::io::stdout.with_max_level(tracing::Level::INFO);
 
-    create_log(stdout, f)
+    create_future_log(stdout, f)
 }
