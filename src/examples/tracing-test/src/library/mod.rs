@@ -57,7 +57,25 @@ pub fn test() {
     });
 }
 
-pub fn create_future_log<W, T>(w: W, f: impl FnOnce() -> T) -> (T, tracing::Dispatch)
+pub fn create_future_log<W, T>(
+    w: W,
+    f: impl FnOnce() -> T,
+) -> (
+    T,
+    tracing_futures::WithDispatch<
+        tracing_subscriber::fmt::Subscriber<
+            tracing_subscriber::fmt::format::DefaultFields,
+            tracing_subscriber::fmt::format::Format<
+                tracing_subscriber::fmt::format::Compact,
+                tracing_subscriber::fmt::time::LocalTime<
+                    time::format_description::well_known::Rfc3339,
+                >,
+            >,
+            tracing_subscriber::filter::LevelFilter,
+            W,
+        >,
+    >,
+)
 where
     W: for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
 {
