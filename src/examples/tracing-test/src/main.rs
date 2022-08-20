@@ -28,10 +28,13 @@ fn main() {
     // subscribers::multi_simple_file_with_default();
     // subscribers::thread_in_with_default();
 
+    use tracing_test::dispatcher;
+    dispatcher::use_with_default();
+
     // use tracing_test::library;
     // library::test();
 
-    use tracing_test::in_future;
+    // use tracing_test::in_future;
     // in_future::tokio_runtime_to_stdout();
     // in_future::tokio_runtime_to_file();
     // in_future::in_await_to_stdout();
@@ -40,6 +43,6 @@ fn main() {
     // in_future::in_tokio_sleep_file();
     // in_future::in_tokio_multi_sleep_stdout();
     // in_future::use_spawn_stdout()
-    in_future::use_tracing_futures_stdout();
+    // in_future::use_tracing_futures_stdout();
     // in_future::use_local_runtime_stdout();
 }
