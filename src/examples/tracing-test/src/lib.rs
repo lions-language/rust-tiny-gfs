@@ -1,5 +1,6 @@
 pub mod basic;
 pub mod custom_field;
+pub mod dispatcher;
 pub mod in_future;
 pub mod macros;
 pub mod simple_file;
