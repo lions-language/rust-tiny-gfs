@@ -206,7 +206,7 @@ fn use_tracing_futures(
     use tracing::info;
 
     let _g = std::thread::spawn(move || {
-        crate::library::create_log(w, move || -> Result<(), String> {
+        let (r, d) = crate::library::create_future_log(w, move || -> Result<(), String> {
             info!("log 1");
 
             use tokio::runtime::Runtime;
@@ -225,7 +225,7 @@ fn use_tracing_futures(
             });
 
             Ok(())
-        })
+        });
     })
     .join();
 }
