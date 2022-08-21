@@ -1,5 +1,3 @@
-use tracing::Subscriber;
-
 pub fn create_log<W, T>(w: W, f: impl FnOnce() -> T) -> T
 where
     W: for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
