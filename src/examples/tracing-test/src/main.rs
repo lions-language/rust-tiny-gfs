@@ -29,7 +29,8 @@ fn main() {
     // subscribers::thread_in_with_default();
 
     use tracing_test::dispatcher;
-    dispatcher::use_with_default();
+    // dispatcher::use_with_default();
+    dispatcher::tracing_future_with_default();
 
     // use tracing_test::library;
     // library::test();

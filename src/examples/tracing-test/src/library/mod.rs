@@ -107,3 +107,25 @@ pub fn create_future_stdout_log<T>(
 
     create_future_log(stdout, f)
 }
+
+pub fn create_future_dispatch_log<W, T>(w: W, f: impl FnOnce() -> T) -> T
+where
+    W: for<'writer> tracing_subscriber::fmt::MakeWriter<'writer> + 'static + Send + Sync,
+{
+    use tracing_subscriber::fmt::time::LocalTime;
+
+    let subscriber = tracing_subscriber::fmt()
+        .with_writer(w)
+        .with_max_level(tracing::Level::INFO)
+        .with_ansi(false)
+        .with_timer(LocalTime::rfc_3339())
+        .compact()
+        .finish();
+
+    let my_dispatch = tracing::Dispatch::new(subscriber);
+    use tracing_futures::WithSubscriber;
+
+    let dispatch = my_dispatch.with_current_subscriber();
+
+    tracing::dispatcher::with_default(dispatch.dispatch(), f)
+}
